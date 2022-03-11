@@ -80,21 +80,7 @@ class WideResNet(nn.Module):
     def forward(self, input):
         output = {}
         output['target'] = self.f(input['data'])
-        if 'loss_mode' in input:
-            if input['loss_mode'] == 'sup':
-                output['loss'] = loss_fn(output['target'], input['target'])
-            elif input['loss_mode'] == 'fix':
-                aug_output = self.f(input['aug'])
-                output['loss'] = loss_fn(aug_output, input['target'].detach())
-            elif input['loss_mode'] == 'fix-mix':
-                aug_output = self.f(input['aug'])
-                output['loss'] = loss_fn(aug_output, input['target'].detach())
-                mix_output = self.f(input['mix_data'])
-                output['loss'] += input['lam'] * loss_fn(mix_output, input['mix_target'][:, 0].detach()) + (
-                        1 - input['lam']) * loss_fn(mix_output, input['mix_target'][:, 1].detach())
-        else:
-            if not torch.any(input['target'] == -1):
-                output['loss'] = loss_fn(output['target'], input['target'])
+        output['loss'] = loss_fn(output['target'], input['target'])
         return output
 
 

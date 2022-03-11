@@ -114,9 +114,8 @@ def process_dataset(dataset):
 
 
 def process_control():
-    if cfg['control']['num_supervised'] == 'fs':
-        cfg['control']['num_supervised'] = '-1'
-    cfg['num_supervised'] = int(cfg['control']['num_supervised'])
+    cfg['data_name'] = cfg['control']['data_name']
+    cfg['model_name'] = cfg['control']['model_name']
     data_shape = {'CIFAR10': [3, 32, 32], 'CIFAR100': [3, 32, 32], 'SVHN': [3, 32, 32]}
     cfg['data_shape'] = data_shape[cfg['data_name']]
     cfg['conv'] = {'hidden_size': [32, 64]}
@@ -127,23 +126,14 @@ def process_control():
     cfg['threshold'] = 0.95
     cfg['alpha'] = 0.75
     if 'num_clients' in cfg['control']:
-        cfg['loss_mode'] = cfg['control']['loss_mode']
         cfg['num_clients'] = int(cfg['control']['num_clients'])
         cfg['active_rate'] = float(cfg['control']['active_rate'])
         cfg['data_split_mode'] = cfg['control']['data_split_mode']
-        cfg['local_epoch'] = int(cfg['control']['local_epoch'])
-        cfg['gm'] = float(cfg['control']['gm'])
-        cfg['sbn'] = int(cfg['control']['sbn'])
-        if 'ft' in cfg['control']:
-            cfg['ft'] = int(cfg['control']['ft'])
-        if 'lc' in cfg['control']:
-            cfg['lc'] = int(cfg['control']['lc'])
+        cfg['local_epoch'] = 5
+        cfg['gm'] = 0
         cfg['server'] = {}
         cfg['server']['shuffle'] = {'train': True, 'test': False}
-        if cfg['num_supervised'] > 250:
-            cfg['server']['batch_size'] = {'train': 250, 'test': 500}
-        else:
-            cfg['server']['batch_size'] = {'train': 10, 'test': 500}
+        cfg['server']['batch_size'] = {'train': 250, 'test': 500}
         cfg['client'] = {}
         cfg['client']['shuffle'] = {'train': True, 'test': False}
         if cfg['num_clients'] > 10:
@@ -176,16 +166,13 @@ def process_control():
         model_name = cfg['model_name']
         cfg[model_name]['shuffle'] = {'train': True, 'test': False}
         cfg[model_name]['optimizer_name'] = 'SGD'
-        cfg[model_name]['lr'] = 1e-1
+        cfg[model_name]['lr'] = 3e-2
         cfg[model_name]['momentum'] = 0.9
         cfg[model_name]['weight_decay'] = 5e-4
         cfg[model_name]['nesterov'] = True
         cfg[model_name]['scheduler_name'] = 'CosineAnnealingLR'
         cfg[model_name]['num_epochs'] = 400
-        if cfg['num_supervised'] > 1000 or cfg['num_supervised'] == -1:
-            cfg[model_name]['batch_size'] = {'train': 250, 'test': 500}
-        else:
-            cfg[model_name]['batch_size'] = {'train': 10, 'test': 500}
+        cfg[model_name]['batch_size'] = {'train': 250, 'test': 500}
     return
 
 
@@ -268,18 +255,16 @@ def make_scheduler(optimizer, tag):
 
 
 def resume(model_tag, load_tag='checkpoint', verbose=True):
-    if os.path.exists('./output/model/{}_{}.pt'.format(model_tag, load_tag)):
-        result = load('./output/model/{}_{}.pt'.format(model_tag, load_tag))
+    if cfg['resume_mode'] == 1:
+        if os.path.exists('./output/model/{}_{}.pt'.format(model_tag, load_tag)):
+            result = load('./output/model/{}_{}.pt'.format(model_tag, load_tag))
+            if verbose:
+                print('Resume from {}'.format(result['epoch']))
+        else:
+            print('Not exists model tag: {}, start from scratch'.format(model_tag))
+            result = None
     else:
-        print('Not exists model tag: {}, start from scratch'.format(model_tag))
-        from datetime import datetime
-        from logger import Logger
-        last_epoch = 1
-        logger_path = 'output/runs/train_{}_{}'.format(cfg['model_tag'], datetime.now().strftime('%b%d_%H-%M-%S'))
-        logger = Logger(logger_path)
-        result = {'epoch': last_epoch, 'logger': logger}
-    if verbose:
-        print('Resume from {}'.format(result['epoch']))
+        result = None
     return result
 
 

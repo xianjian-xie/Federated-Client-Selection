@@ -254,12 +254,11 @@ def make_scheduler(optimizer, tag):
     return scheduler
 
 
-def resume(model_tag, load_tag='checkpoint', verbose=True):
-    if cfg['resume_mode'] == 1:
-        if os.path.exists('./output/model/{}_{}.pt'.format(model_tag, load_tag)):
-            result = load('./output/model/{}_{}.pt'.format(model_tag, load_tag))
-            if verbose:
-                print('Resume from {}'.format(result['epoch']))
+def resume(model_tag, load_tag='checkpoint', verbose=True, resume_mode=1):
+    if os.path.exists('./output/model/{}_{}.pt'.format(model_tag, load_tag)) and resume_mode == 1:
+        result = load('./output/model/{}_{}.pt'.format(model_tag, load_tag))
+        if verbose:
+            print('Resume from {}'.format(result['epoch']))
         else:
             print('Not exists model tag: {}, start from scratch'.format(model_tag))
             result = None

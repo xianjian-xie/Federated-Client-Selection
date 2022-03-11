@@ -8,9 +8,8 @@ import torch.nn.functional as F
 import models
 from itertools import compress
 from config import cfg
-from data import make_data_loader, make_batchnorm_stats, FixTransform, MixDataset
+from data import make_data_loader
 from utils import to_device, make_optimizer, collate
-from metrics import Accuracy
 
 
 class Server:
@@ -21,11 +20,10 @@ class Server:
         global_optimizer = make_optimizer(model, 'global')
         self.global_optimizer_state_dict = global_optimizer.state_dict()
 
-    def distribute(self, client, batchnorm_dataset=None):
+    def distribute(self, client):
         model = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+        model.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
         model.load_state_dict(self.model_state_dict)
-        if batchnorm_dataset is not None:
-            model = make_batchnorm_stats(batchnorm_dataset, model, 'global')
         model_state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         for m in range(len(client)):
             if client[m].active:
@@ -37,6 +35,7 @@ class Server:
             valid_client = [client[i] for i in range(len(client)) if client[i].active]
             if len(valid_client) > 0:
                 model = eval('models.{}()'.format(cfg['model_name']))
+                model.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
                 model.load_state_dict(self.model_state_dict)
                 global_optimizer = make_optimizer(model, 'global')
                 global_optimizer.load_state_dict(self.global_optimizer_state_dict)
@@ -58,8 +57,6 @@ class Server:
         return
 
 
-
-
 class Client:
     def __init__(self, client_id, model, data_split):
         self.client_id = client_id
@@ -73,6 +70,7 @@ class Client:
     def train(self, dataset, lr, metric, logger):
         data_loader = make_data_loader({'train': dataset}, 'client')['train']
         model = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+        model.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
         model.load_state_dict(self.model_state_dict, strict=False)
         self.optimizer_state_dict['param_groups'][0]['lr'] = lr
         optimizer = make_optimizer(model, 'local')

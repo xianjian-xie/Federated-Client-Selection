@@ -1,4 +1,3 @@
-import anytree
 import codecs
 import numpy as np
 import os
@@ -6,7 +5,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from utils import check_exists, makedir_exist_ok, save, load
-from .utils import download_url, extract_file, make_classes_counts, make_tree, make_flat_index
+from .utils import download_url, extract_file, make_classes_counts
 
 
 class MNIST(Dataset):
@@ -26,16 +25,15 @@ class MNIST(Dataset):
         self.transform = transform
         if not check_exists(self.processed_folder):
             self.process()
-        id, self.data, self.target = load(os.path.join(self.processed_folder, '{}.pt'.format(self.split)),
-                                          mode='pickle')
+        self.id, self.data, self.target = load(os.path.join(self.processed_folder, '{}.pt'.format(self.split)),
+                                               mode='pickle')
         self.classes_counts = make_classes_counts(self.target)
         self.classes_to_labels, self.target_size = load(os.path.join(self.processed_folder, 'meta.pt'), mode='pickle')
-        self.other = {'id': id}
 
     def __getitem__(self, index):
-        data, target = Image.fromarray(self.data[index], mode='L'), torch.tensor(self.target[index])
-        other = {k: torch.tensor(self.other[k][index]) for k in self.other}
-        input = {**other, 'data': data, 'target': target}
+        id, data, target = torch.tensor(self.id[index]), Image.fromarray(self.data[index], mode='L'), torch.tensor(
+            self.target[index])
+        input = {'id': id, 'data': data, 'target': target}
         if self.transform is not None:
             input = self.transform(input)
         return input
@@ -64,7 +62,7 @@ class MNIST(Dataset):
         makedir_exist_ok(self.raw_folder)
         for (url, md5) in self.file:
             filename = os.path.basename(url)
-            download_url(url, self.raw_folder, filename, md5)
+            download_url(url, os.path.join(self.raw_folder, filename), md5)
             extract_file(os.path.join(self.raw_folder, filename))
         return
 
@@ -79,11 +77,9 @@ class MNIST(Dataset):
         train_target = read_label_file(os.path.join(self.raw_folder, 'train-labels-idx1-ubyte'))
         test_target = read_label_file(os.path.join(self.raw_folder, 't10k-labels-idx1-ubyte'))
         train_id, test_id = np.arange(len(train_data)).astype(np.int64), np.arange(len(test_data)).astype(np.int64)
-        classes_to_labels = anytree.Node('U', index=[])
         classes = list(map(str, list(range(10))))
-        for c in classes:
-            make_tree(classes_to_labels, [c])
-        target_size = make_flat_index(classes_to_labels)
+        classes_to_labels = {classes[i]: i for i in range(len(classes))}
+        target_size = len(classes)
         return (train_id, train_data, train_target), (test_id, test_data, test_target), (classes_to_labels, target_size)
 
 
@@ -104,12 +100,10 @@ class FashionMNIST(MNIST):
         train_target = read_label_file(os.path.join(self.raw_folder, 'train-labels-idx1-ubyte'))
         test_target = read_label_file(os.path.join(self.raw_folder, 't10k-labels-idx1-ubyte'))
         train_id, test_id = np.arange(len(train_data)).astype(np.int64), np.arange(len(test_data)).astype(np.int64)
-        classes_to_labels = anytree.Node('U', index=[])
         classes = ['T-shirt_top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag',
                    'Ankle boot']
-        for c in classes:
-            make_tree(classes_to_labels, c)
-        target_size = make_flat_index(classes_to_labels)
+        classes_to_labels = {classes[i]: i for i in range(len(classes))}
+        target_size = len(classes)
         return (train_id, train_data, train_target), (test_id, test_data, test_target), (classes_to_labels, target_size)
 
 

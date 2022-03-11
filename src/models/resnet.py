@@ -90,21 +90,19 @@ class ResNet(nn.Module):
         return output
 
 
-def resnet9(momentum=None, track=False):
+def resnet9():
     data_shape = cfg['data_shape']
     target_size = cfg['target_size']
     hidden_size = cfg['resnet9']['hidden_size']
     model = ResNet(data_shape, hidden_size, Block, [1, 1, 1, 1], target_size)
     model.apply(init_param)
-    model.apply(lambda m: make_batchnorm(m, momentum=momentum, track_running_stats=track))
     return model
 
 
-def resnet18(momentum=None, track=False):
+def resnet18():
     data_shape = cfg['data_shape']
     target_size = cfg['target_size']
     hidden_size = cfg['resnet18']['hidden_size']
     model = ResNet(data_shape, hidden_size, Block, [2, 2, 2, 2], target_size)
     model.apply(init_param)
-    model.apply(lambda m: make_batchnorm(m, momentum=momentum, track_running_stats=track))
     return model

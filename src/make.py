@@ -52,7 +52,7 @@ def main():
         controls = make_controls(script_name, init_seeds, world_size, num_experiments, resume_mode, control_name)
     elif mode == 'fl-cd':
         script_name = [['{}_classifier_fl.py'.format(run)]]
-        control_name = [[[data], [model], ['fs'], ['100'], ['0.1'], ['iid', 'non-iid-l-2']]]
+        control_name = [[[data], [model], ['100'], ['0.1'], ['iid', 'non-iid-l-2']]]
         controls = make_controls(script_name, init_seeds, world_size, num_experiments, resume_mode, control_name)
     elif mode == 'fl-ub':
         script_name = [['{}_classifier_fl.py'.format(run)]]

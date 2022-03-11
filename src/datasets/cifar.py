@@ -1,4 +1,3 @@
-import anytree
 import numpy as np
 import os
 import pickle
@@ -6,7 +5,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from utils import check_exists, makedir_exist_ok, save, load
-from .utils import download_url, extract_file, make_classes_counts, make_tree, make_flat_index
+from .utils import download_url, extract_file, make_classes_counts
 
 
 class CIFAR10(Dataset):
@@ -19,16 +18,15 @@ class CIFAR10(Dataset):
         self.transform = transform
         if not check_exists(self.processed_folder):
             self.process()
-        id, self.data, self.target = load(os.path.join(self.processed_folder, '{}.pt'.format(self.split)),
-                                          mode='pickle')
+        self.id, self.data, self.target = load(os.path.join(self.processed_folder, '{}.pt'.format(self.split)),
+                                               mode='pickle')
         self.classes_counts = make_classes_counts(self.target)
         self.classes_to_labels, self.target_size = load(os.path.join(self.processed_folder, 'meta.pt'), mode='pickle')
-        self.other = {'id': id}
 
     def __getitem__(self, index):
-        data, target = Image.fromarray(self.data[index]), torch.tensor(self.target[index])
-        other = {k: torch.tensor(self.other[k][index]) for k in self.other}
-        input = {**other, 'data': data, 'target': target}
+        id, data, target = torch.tensor(self.id[index]), Image.fromarray(self.data[index]), torch.tensor(
+            self.target[index])
+        input = {'id': id, 'data': data, 'target': target}
         if self.transform is not None:
             input = self.transform(input)
         return input
@@ -57,7 +55,7 @@ class CIFAR10(Dataset):
         makedir_exist_ok(self.raw_folder)
         for (url, md5) in self.file:
             filename = os.path.basename(url)
-            download_url(url, self.raw_folder, filename, md5)
+            download_url(url, os.path.join(self.raw_folder, filename), md5)
             extract_file(os.path.join(self.raw_folder, filename))
         return
 
@@ -76,10 +74,8 @@ class CIFAR10(Dataset):
         with open(os.path.join(self.raw_folder, 'cifar-10-batches-py', 'batches.meta'), 'rb') as f:
             data = pickle.load(f, encoding='latin1')
             classes = data['label_names']
-        classes_to_labels = anytree.Node('U', index=[])
-        for c in classes:
-            make_tree(classes_to_labels, [c])
-        target_size = make_flat_index(classes_to_labels)
+        classes_to_labels = {classes[i]: i for i in range(len(classes))}
+        target_size = len(classes)
         return (train_id, train_data, train_target), (test_id, test_data, test_target), (classes_to_labels, target_size)
 
 
@@ -96,14 +92,8 @@ class CIFAR100(CIFAR10):
         with open(os.path.join(self.raw_folder, 'cifar-100-python', 'meta'), 'rb') as f:
             data = pickle.load(f, encoding='latin1')
             classes = data['fine_label_names']
-        classes_to_labels = anytree.Node('U', index=[])
-        for c in classes:
-            for k in CIFAR100_classes:
-                if c in CIFAR100_classes[k]:
-                    c = [k, c]
-                    break
-            make_tree(classes_to_labels, c)
-        target_size = make_flat_index(classes_to_labels, classes)
+        classes_to_labels = {classes[i]: i for i in range(len(classes))}
+        target_size = len(classes)
         return (train_id, train_data, train_target), (test_id, test_data, test_target), (classes_to_labels, target_size)
 
 
@@ -117,6 +107,7 @@ def read_pickle_file(path, filenames):
             label.extend(entry['labels']) if 'labels' in entry else label.extend(entry['fine_labels'])
     img = np.vstack(img).reshape(-1, 3, 32, 32)
     img = img.transpose((0, 2, 3, 1))
+    label = np.array(label).astype(np.int64)
     return img, label
 
 

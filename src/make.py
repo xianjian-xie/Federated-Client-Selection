@@ -28,7 +28,7 @@ def make_controls(script_name, init_seeds, world_size, num_experiments, resume_m
 
 
 def main():
-    run = args['run']
+    run = args['run']       # run is train or test
     num_gpus = args['num_gpus']
     world_size = args['world_size']
     round = args['round']
@@ -47,7 +47,7 @@ def main():
     resume_mode = [[resume_mode]]
     filename = '{}_{}'.format(run, mode)
     if mode == 'fs':
-        script_name = [['{}_classifier.py'.format(run)]]
+        script_name = [['{}_classifier.py'.format(run)]]    
         control_name = [[[data], [model]]]
         controls = make_controls(script_name, init_seeds, world_size, num_experiments, resume_mode, control_name)
     elif mode == 'fl-cd':

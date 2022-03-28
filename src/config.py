@@ -5,7 +5,7 @@ if 'cfg' not in globals():
     with open('config.yml', 'r') as f:
         cfg = yaml.load(f, Loader=yaml.FullLoader)
 
-
+# control name 是值用’_‘连在一起，control是control key和control name形成的字典
 def process_args(args):
     for k in cfg:
         cfg[k] = args[k]

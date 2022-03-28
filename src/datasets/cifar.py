@@ -69,6 +69,8 @@ class CIFAR10(Dataset):
         test_filenames = ['test_batch']
         train_data, train_target = read_pickle_file(os.path.join(self.raw_folder, 'cifar-10-batches-py'),
                                                     train_filenames)
+        print('train data',train_data)
+        print('train target',train_target)
         test_data, test_target = read_pickle_file(os.path.join(self.raw_folder, 'cifar-10-batches-py'), test_filenames)
         train_id, test_id = np.arange(len(train_data)).astype(np.int64), np.arange(len(test_data)).astype(np.int64)
         with open(os.path.join(self.raw_folder, 'cifar-10-batches-py', 'batches.meta'), 'rb') as f:

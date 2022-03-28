@@ -12,14 +12,14 @@ from utils import makedir_exist_ok
 
 IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif']
 
-
+# 返回class label
 def find_classes(dir):
     classes = [d.name for d in os.scandir(dir) if d.is_dir()]
     classes.sort()
     classes_to_labels = {classes[i]: i for i in range(len(classes))}
     return classes_to_labels
 
-
+# python image library
 def pil_loader(path):
     with open(path, 'rb') as f:
         img = Image.open(f)
@@ -41,7 +41,7 @@ def default_loader(path):
     else:
         return pil_loader(path)
 
-
+# 有一个允许extension返回true，全部不允许返回false
 def has_file_allowed_extension(filename, extensions):
     filename_lower = filename.lower()
     return any(filename_lower.endswith(ext) for ext in extensions)
@@ -51,6 +51,7 @@ def make_classes_counts(label):
     label = np.array(label)
     if label.ndim > 1:
         label = label.sum(axis=tuple([i for i in range(1, label.ndim)]))
+        # summing along all axis
     classes_counts = Counter(label)
     return classes_counts
 

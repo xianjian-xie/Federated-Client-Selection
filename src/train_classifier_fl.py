@@ -50,6 +50,7 @@ def runExperiment():
     data_split = split_dataset(dataset, cfg['num_clients'], cfg['data_split_mode'])
     metric = Metric({'train': ['Loss', 'Accuracy'], 'test': ['Loss', 'Accuracy']})
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
+    # print('dataset',dataset['train'])
     if result is None:
         last_epoch = 1
         server = make_server(model)
@@ -108,6 +109,7 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     for i in range(num_active_clients):
         m = client_id[i]
         dataset_m = separate_dataset(dataset, client[m].data_split['train'])
+        # print('dataset1',dataset_m.data)
         if dataset_m is not None:
             client[m].active = True
             client[m].train(dataset_m, lr, metric, logger)

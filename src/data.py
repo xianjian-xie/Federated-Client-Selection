@@ -74,6 +74,7 @@ def input_collate(batch):
 def make_data_loader(dataset, tag, batch_size=None, shuffle=None, sampler=None, batch_sampler=None):
     data_loader = {}
     for k in dataset:
+        # print(k) k是train 或 test
         _batch_size = cfg[tag]['batch_size'][k] if batch_size is None else batch_size[k]
         _shuffle = cfg[tag]['shuffle'][k] if shuffle is None else shuffle[k]
         if sampler is not None:

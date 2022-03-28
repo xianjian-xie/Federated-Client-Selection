@@ -24,10 +24,21 @@ class Server:
         model = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
         model.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
         model.load_state_dict(self.model_state_dict)
+        # print('model.state_dict().items()',model.state_dict().items())
+        # for k, v in model.named_parameters():
+            # print('k is', k)
+            # print('v is', v.data)
+            # break
+        # print('model.state_dict().items()',model.named_parameters().keys())
         model_state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
+        # print('model_state_dict', model_state_dict.keys())
+        for k, v in model.state_dict().items():
+            print('k is', k)
+            # print('v is', v)
         for m in range(len(client)):
             if client[m].active:
                 client[m].model_state_dict = copy.deepcopy(model_state_dict)
+                # print('model param', client[m].model_state_dict.keys())
         return
 
     def update(self, client):
@@ -43,6 +54,7 @@ class Server:
                 weight = torch.ones(len(valid_client))
                 weight = weight / weight.sum()
                 for k, v in model.named_parameters():
+                    # print('k', k)
                     parameter_type = k.split('.')[-1]
                     if 'weight' in parameter_type or 'bias' in parameter_type:
                         tmp_v = v.data.new_zeros(v.size())

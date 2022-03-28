@@ -16,7 +16,7 @@ def check_exists(path):
 
 def makedir_exist_ok(path):
     try:
-        os.makedirs(path)
+        os.makedirs(path)       # 创建目录
     except OSError as e:
         if e.errno == errno.EEXIST:
             pass
@@ -54,7 +54,8 @@ def load(path, mode='torch'):
 def save_img(img, path, nrow=10, padding=2, pad_value=0, range=None):
     makedir_exist_ok(os.path.dirname(path))
     normalize = False if range is None else True
-    save_image(img, path, nrow=nrow, padding=padding, pad_value=pad_value, normalize=normalize, range=range)
+    save_image(img, path, nrow=nrow, padding=padding, pad_value=pad_value, normalize=normalize, range=range)    
+    #  将tensor保存为图片
     return
 
 
@@ -62,7 +63,7 @@ def to_device(input, device):
     output = recur(lambda x, y: x.to(y), input, device)
     return output
 
-
+#  可迭代对象返回本身，不可迭代返回重复n次的元组
 def ntuple(n):
     def parse(x):
         if isinstance(x, container_abcs.Iterable) and not isinstance(x, str):
@@ -73,14 +74,14 @@ def ntuple(n):
 
 
 def apply_fn(module, fn):
-    for n, m in module.named_children():
-        if hasattr(m, fn):
+    for n, m in module.named_children():    #返回子模块的迭代器
+        if hasattr(m, fn):  #对象是否包含对应属性，has attribute
             exec('m.{0}()'.format(fn))
-        if sum(1 for _ in m.named_children()) != 0:
+        if sum(1 for _ in m.named_children()) != 0: #_下面循环不会用到
             exec('apply_fn(m,\'{0}\')'.format(fn))
     return
 
-
+# 分不同类别对数据施加fn函数
 def recur(fn, input, *args):
     if isinstance(input, torch.Tensor) or isinstance(input, np.ndarray):
         output = fn(input, *args)
@@ -105,14 +106,14 @@ def recur(fn, input, *args):
         raise ValueError('Not valid input type')
     return output
 
-
+# 赋值cfg
 def process_dataset(dataset):
     cfg['data_size'] = {'train': len(dataset['train']), 'test': len(dataset['train'])}
     cfg['target_size'] = dataset['train'].target_size
     cfg['batch_ratio'] = 0.05
     return
 
-
+# 赋值cfg
 def process_control():
     cfg['data_name'] = cfg['control']['data_name']
     cfg['model_name'] = cfg['control']['model_name']
@@ -265,7 +266,7 @@ def resume(model_tag, load_tag='checkpoint', verbose=True, resume_mode=1):
         result = None
     return result
 
-
+# 整理
 def collate(input):
     for k in input:
         input[k] = torch.stack(input[k], 0)

@@ -32,9 +32,9 @@ class Server:
         # print('model.state_dict().items()',model.named_parameters().keys())
         model_state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         # print('model_state_dict', model_state_dict.keys())
-        for k, v in model.state_dict().items():
-            print('k is', k)
-            # print('v is', v)
+        # for k, v in model.state_dict().items():
+        #     # print('k is', k)
+        #     # print('v is', v)
         for m in range(len(client)):
             if client[m].active:
                 client[m].model_state_dict = copy.deepcopy(model_state_dict)

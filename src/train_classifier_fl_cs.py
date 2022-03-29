@@ -8,8 +8,8 @@ import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
 from config import cfg, process_args
-from data import fetch_dataset, split_dataset, make_data_loader, separate_dataset, make_batchnorm_dataset, \
-    make_batchnorm_stats
+from data import fetch_dataset, shuffle_dataset_target, split_dataset, make_data_loader, separate_dataset, make_batchnorm_dataset, \
+    make_batchnorm_stats, shuffle_dataset_target
 from metrics import Metric
 from modules import Server, Client
 from utils import save, to_device, process_control, process_dataset, make_optimizer, make_scheduler, resume, collate
@@ -115,6 +115,9 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
         # 按照 idx, 把数据集分割成id, data, target
         print('dataset1_len',len(dataset_m.target))
         print('dataset1',dataset_m.target)
+        if i==0:
+            dataset_m = shuffle_dataset_target(dataset_m)
+        print('dataset2',dataset_m.target)
         if dataset_m is not None:
             client[m].active = True
             client[m].train(dataset_m, lr, metric, logger)

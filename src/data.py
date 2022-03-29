@@ -172,6 +172,13 @@ def separate_dataset(dataset, idx):
     separated_dataset.id = list(range(len(separated_dataset.data)))
     return separated_dataset
 
+def shuffle_dataset_target(dataset):
+    shuffled_dataset = copy.deepcopy(dataset)
+    for i in range(len(shuffled_dataset.target)):
+        shuffled_dataset.target[i] = shuffled_dataset.target[(i+1)%len(shuffled_dataset.target)]
+    return shuffled_dataset
+    
+
 
 def make_batchnorm_dataset(dataset):
     dataset = copy.deepcopy(dataset)
@@ -192,3 +199,5 @@ def make_batchnorm_stats(dataset, model, tag):
             input = to_device(input, cfg['device'])
             test_model(input)
     return test_model
+
+

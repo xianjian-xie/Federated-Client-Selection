@@ -80,6 +80,7 @@ class Logger:
         if self.writer is not None:
             self.iterator[info_name] += 1
             self.writer.add_text(info_name, info, self.iterator[info_name])
+        # print('info is', info) # info就是log的输出信息
         return info
 
     def flush(self):

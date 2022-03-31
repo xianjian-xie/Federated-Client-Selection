@@ -54,7 +54,7 @@ class Server:
                 weight = torch.ones(len(valid_client))
                 weight = weight / weight.sum()
                 for k, v in model.named_parameters():
-                    # print('k', k)
+                    print('k is', k)
                     parameter_type = k.split('.')[-1]
                     if 'weight' in parameter_type or 'bias' in parameter_type:
                         tmp_v = v.data.new_zeros(v.size())
@@ -78,6 +78,7 @@ class Client:
         self.optimizer_state_dict = optimizer.state_dict()
         self.active = False
         self.buffer = None
+        self.good = True
 
     def train(self, dataset, lr, metric, logger):
         data_loader = make_data_loader({'train': dataset}, 'client')['train']

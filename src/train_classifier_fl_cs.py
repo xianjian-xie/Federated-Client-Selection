@@ -50,7 +50,7 @@ def runExperiment():
     data_split = split_dataset(dataset, cfg['num_clients'], cfg['data_split_mode'])
     metric = Metric({'train': ['Loss', 'Accuracy'], 'test': ['Loss', 'Accuracy']})
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
-    print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
+    # print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
     if result is None:
         last_epoch = 1
         server = make_server(model)
@@ -98,7 +98,7 @@ def make_client(model, data_split):
 
 def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     logger.safe(True)
-    num_active_clients = int(np.ceil(cfg['active_rate'] * cfg['num_clients']))
+    num_active_clients = int(np.ceil(cfg['active_rate'] * cfg['num_clients']))  # 100 clients只激活了0.1，即10个
     client_id = torch.arange(cfg['num_clients'])[torch.randperm(cfg['num_clients'])[:num_active_clients]].tolist()
     for i in range(num_active_clients):
         client[client_id[i]].active = True
@@ -106,18 +106,21 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     num_active_clients = len(client_id)
     start_time = time.time()
     lr = optimizer.param_groups[0]['lr']
+    # print('active_clients', num_active_clients) #10
     for i in range(num_active_clients):
         m = client_id[i]
-        print('m is', m)
+        # print('m is', m) # m 是 第i个client的id号
         dataset_m = separate_dataset(dataset, client[m].data_split['train'])
-        print('client_m_data_split_train_len', len(client[m].data_split['train']))
-        print('client_m_data_split_train', client[m].data_split['train']) # 第m个client包含的数据的idx号
+        # print('client_m_data_split_train_len', len(client[m].data_split['train']))
+        # print('client_m_data_split_train', client[m].data_split['train']) # 第m个client包含的数据的idx号
         # 按照 idx, 把数据集分割成id, data, target
-        print('dataset1_len',len(dataset_m.target))
-        print('dataset1',dataset_m.target)
+        # print('dataset1_len',len(dataset_m.target))
+        # print('dataset1',dataset_m.target)
+
         if i==0:
             dataset_m = shuffle_dataset_target(dataset_m)
-        print('dataset2',dataset_m.target)
+
+        # print('dataset2',dataset_m.target)
         if dataset_m is not None:
             client[m].active = True
             client[m].train(dataset_m, lr, metric, logger)

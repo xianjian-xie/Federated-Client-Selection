@@ -8,10 +8,12 @@ def Accuracy(output, target, topk=1):
     with torch.no_grad():
         if target.dtype != torch.int64:
             target = (target.topk(1, 1, True, True)[1]).view(-1)
-        batch_size = target.size(0)
+        batch_size = target.size(0) # 10
+        # print('batch_size',batch_size)
         pred_k = output.topk(topk, 1, True, True)[1]
         correct_k = pred_k.eq(target.view(-1, 1).expand_as(pred_k)).float().sum()
-        acc = (correct_k * (100.0 / batch_size)).item()
+        # print('correct_k', correct_k)
+        acc = (correct_k * (100.0 / batch_size)).item() #用于将一个零维张量转换成浮点数
     return acc
 
 

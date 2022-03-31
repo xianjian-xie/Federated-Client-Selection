@@ -47,13 +47,13 @@ def runExperiment():
     optimizer = make_optimizer(model, 'local')
     scheduler = make_scheduler(optimizer, 'global')
     batchnorm_dataset = make_batchnorm_dataset(dataset['train'])
-    data_split = split_dataset(dataset, cfg['num_clients'], cfg['data_split_mode'])
+    data_split = split_dataset(dataset, cfg['num_clients'] + 1, cfg['data_split_mode'])
     metric = Metric({'train': ['Loss', 'Accuracy'], 'test': ['Loss', 'Accuracy']})
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
     # print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
     if result is None:
         last_epoch = 1
-        server = make_server(model)
+        server = make_server(model, data_split)
         client = make_client(model, data_split)
         logger = make_logger(os.path.join('output', 'runs', 'train_{}'.format(cfg['model_tag'])))
     else:
@@ -66,7 +66,7 @@ def runExperiment():
         logger = result['logger']
     for epoch in range(last_epoch, cfg['global']['num_epochs'] + 1):
         train_client(dataset['train'], server, client, optimizer, metric, logger, epoch)
-        server.update(client)
+        server.update(client, dataset['train'], optimizer, metric, logger, epoch )
         scheduler.step()
         model.load_state_dict(server.model_state_dict)
         test_model = make_batchnorm_stats(batchnorm_dataset, model, 'global')
@@ -83,8 +83,8 @@ def runExperiment():
     return
 
 
-def make_server(model):
-    server = Server(model)
+def make_server(model, data_split):
+    server = Server(model, {'train': data_split['train'][cfg['num_clients']], 'test': data_split['test'][cfg['num_clients']]})
     return server
 
 
@@ -110,16 +110,16 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     for i in range(num_active_clients):
         m = client_id[i]
         # print('m is', m) # m 是 第i个client的id号
-        dataset_m = separate_dataset(dataset, client[m].data_split['train'])
+        dataset_m = separate_dataset(dataset, client[m].data_split['train']) #separate 分 data, target
         # print('client_m_data_split_train_len', len(client[m].data_split['train']))
         # print('client_m_data_split_train', client[m].data_split['train']) # 第m个client包含的数据的idx号
         # 按照 idx, 把数据集分割成id, data, target
         # print('dataset1_len',len(dataset_m.target))
         # print('dataset1',dataset_m.target)
-
+        ############################################################
         if i==0:
             dataset_m = shuffle_dataset_target(dataset_m)
-
+        ############################################################
         # print('dataset2',dataset_m.target)
         if dataset_m is not None:
             client[m].active = True

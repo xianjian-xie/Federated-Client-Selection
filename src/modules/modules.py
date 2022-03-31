@@ -8,17 +8,18 @@ import torch.nn.functional as F
 import models
 from itertools import compress
 from config import cfg
-from data import make_data_loader
+from data import make_data_loader, separate_dataset
 from utils import to_device, make_optimizer, collate
 
 
 class Server:
-    def __init__(self, model):
+    def __init__(self, model, data_split):
         self.model_state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         optimizer = make_optimizer(model, 'local')
         self.optimizer_state_dict = optimizer.state_dict()
         global_optimizer = make_optimizer(model, 'global')
         self.global_optimizer_state_dict = global_optimizer.state_dict()
+        self.data_split = data_split
 
     def distribute(self, client):
         model = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
@@ -41,7 +42,7 @@ class Server:
                 # print('model param', client[m].model_state_dict.keys())
         return
 
-    def update(self, client):
+    def update(self, client, dataset, optimizer, metric, logger, epoch):
         with torch.no_grad():
             valid_client = [client[i] for i in range(len(client)) if client[i].active]
             if len(valid_client) > 0:
@@ -53,6 +54,20 @@ class Server:
                 global_optimizer.zero_grad()
                 weight = torch.ones(len(valid_client))
                 weight = weight / weight.sum()
+                ###################################
+                dataset_server_validation = separate_dataset(dataset, self.data_split['train'])
+                data_loader_server_validation = make_data_loader({'train': dataset_server_validation}, 'client')['train']
+
+                for m in range(len(valid_client)):
+                    
+                    model_validation = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+                    model_validation.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
+                    model_validation.load_state_dict(client[m].model_state_dict, strict=False)
+                    # self.optimizer_state_dict['param_groups'][0]['lr'] = lr
+                    optimizer_validation = make_optimizer(model_validation, 'local')
+                    optimizer_validation.load_state_dict(client[m].optimizer_state_dict)
+                    model_validation.train(True)
+                ###################################
                 for k, v in model.named_parameters():
                     print('k is', k)
                     parameter_type = k.split('.')[-1]

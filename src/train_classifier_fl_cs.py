@@ -36,6 +36,8 @@ def main():
 
 
 def runExperiment():
+    celist = [0,1,2,3,4]
+    print('ceshi', celist[2:2])
     cfg['seed'] = int(cfg['model_tag'].split('_')[0])
     torch.manual_seed(cfg['seed'])
     torch.cuda.manual_seed(cfg['seed'])
@@ -48,7 +50,7 @@ def runExperiment():
     scheduler = make_scheduler(optimizer, 'global')
     batchnorm_dataset = make_batchnorm_dataset(dataset['train'])
     data_split = split_dataset(dataset, cfg['num_clients'] + 1, cfg['data_split_mode'])
-    metric = Metric({'train': ['Loss', 'Accuracy'], 'test': ['Loss', 'Accuracy']})
+    metric = Metric({'train': ['Loss', 'Accuracy'], 'test': ['Loss', 'Accuracy'], 'validation': ['Loss', 'Accuracy']} )
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
     # print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
     if result is None:
@@ -64,8 +66,17 @@ def runExperiment():
         optimizer.load_state_dict(result['optimizer_state_dict'])
         scheduler.load_state_dict(result['scheduler_state_dict'])
         logger = result['logger']
+    # 
+    # print('datasplit',data_split['train'][cfg['num_clients']],len(data_split['train'][cfg['num_clients']]),cfg['num_clients'])
+    # server_split = {'train': data_split['train'][cfg['num_clients']], 'test': data_split['test'][cfg['num_clients']]}
+    # dataset_server_validation = separate_dataset(dataset['train'], server_split['train'])
+    # data_loader_server_validation = make_data_loader({'train': dataset_server_validation}, 'client')['train']
+    # print('length', len(data_loader_server_validation))
+    # length 50, 遍历loader一共49个
+    # 
     for epoch in range(last_epoch, cfg['global']['num_epochs'] + 1):
         train_client(dataset['train'], server, client, optimizer, metric, logger, epoch)
+        # server.select_client(client, dataset['train'], optimizer, metric, logger, epoch)
         server.update(client, dataset['train'], optimizer, metric, logger, epoch )
         scheduler.step()
         model.load_state_dict(server.model_state_dict)
@@ -100,6 +111,7 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     logger.safe(True)
     num_active_clients = int(np.ceil(cfg['active_rate'] * cfg['num_clients']))  # 100 clients只激活了0.1，即10个
     client_id = torch.arange(cfg['num_clients'])[torch.randperm(cfg['num_clients'])[:num_active_clients]].tolist()
+    print('client id1', client_id)
     for i in range(num_active_clients):
         client[client_id[i]].active = True
     server.distribute(client)
@@ -109,7 +121,7 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
     # print('active_clients', num_active_clients) #10
     for i in range(num_active_clients):
         m = client_id[i]
-        # print('m is', m) # m 是 第i个client的id号
+        print('m is', m) # m 是 第i个client的id号
         dataset_m = separate_dataset(dataset, client[m].data_split['train']) #separate 分 data, target
         # print('client_m_data_split_train_len', len(client[m].data_split['train']))
         # print('client_m_data_split_train', client[m].data_split['train']) # 第m个client包含的数据的idx号
@@ -117,7 +129,7 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
         # print('dataset1_len',len(dataset_m.target))
         # print('dataset1',dataset_m.target)
         ############################################################
-        if i==0:
+        if i==1:
             dataset_m = shuffle_dataset_target(dataset_m)
         ############################################################
         # print('dataset2',dataset_m.target)
@@ -139,6 +151,7 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
                              'Epoch Finished Time: {}'.format(epoch_finished_time),
                              'Experiment Finished Time: {}'.format(exp_finished_time)]}
             logger.append(info, 'train', mean=False)
+            # print('metric name', metric.metric_name['train']) # ['Loss', 'Accuracy']
             print(logger.write('train', metric.metric_name['train']))
     logger.safe(False)
     return

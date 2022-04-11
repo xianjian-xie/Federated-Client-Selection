@@ -8,6 +8,7 @@ from utils import ntuple
 class Logger:
     def __init__(self, log_path):
         self.log_path = log_path
+        # print('log_path', log_path)
         self.writer = None
         self.tracker = defaultdict(int)
         self.counter = defaultdict(int)
@@ -35,7 +36,11 @@ class Logger:
     def append(self, result, tag, n=1, mean=True):
         for k in result:
             name = '{}/{}'.format(tag, k)
+            # tag is train/test, k is loss/accuracy
             self.tracker[name] = result[k]
+            # print('kan', name, result[k])
+            # kan train/Loss 2.0879716873168945
+            # kan train/Accuracy 20.0
             if mean:
                 if isinstance(result[k], Number):
                     self.counter[name] += n
@@ -59,6 +64,9 @@ class Logger:
         evaluation_info = []
         for name in names:
             tag, k = name.split('/')
+            # print('name tag k', name, tag, k)
+            # name tag k train/Loss train Loss
+            # name tag k train/Accuracy train Accuracy
             if isinstance(self.mean[name], Number):
                 s = self.mean[name]
                 evaluation_info.append('{}: {:.4f}'.format(k, s))
@@ -75,12 +83,25 @@ class Logger:
                 raise ValueError('Not valid data type')
         info_name = '{}/info'.format(tag)
         info = self.tracker[info_name]
+        # info是list
+        # print('info size', len(info), info)
         info[2:2] = evaluation_info
+        # Demonstration of list insert() method
+        # odd = [1, 9]
+        # odd.insert(1,3)
+        # print(odd)
+        # odd[2:2] = [5, 7]
+        # print(odd)
+        # Output
+        # [1, 3, 9]
+        # [1, 3, 5, 7, 9]
+        # print('info 2 2', type(info), info[2:2])
         info = '  '.join(info)
+        # print('info1', info) # info就是log的输出信息
         if self.writer is not None:
             self.iterator[info_name] += 1
             self.writer.add_text(info_name, info, self.iterator[info_name])
-        # print('info is', info) # info就是log的输出信息
+        # print('info2', info) # info就是log的输出信息
         return info
 
     def flush(self):

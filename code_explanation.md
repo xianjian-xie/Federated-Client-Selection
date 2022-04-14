@@ -26,11 +26,11 @@ https://blog.csdn.net/qinyilang/article/details/5484415
    1. 
    conda activate recsys_ae_conda python=3.8
    <!-- train_classifier_fl -->
-   !python train_classifier_fl.py --control_name CIFAR10_wresnet28x2_100_0.1_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
+   !python train_classifier_fl.py --control_name CIFAR10_wresnet28x2_100_0.03_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
   <!-- train_classifier_fl 标准-->
    python train_classifier_fl_cs.py --control_name CIFAR10_wresnet28x2_100_0.1_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
 
-   python train_classifier_fl_cs.py --control_name CIFAR10_wresnet28x2_100_0.02_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
+   python train_classifier_fl_cs.py --control_name CIFAR10_wresnet28x2_100_0.01_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
 
 
    

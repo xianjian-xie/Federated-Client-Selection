@@ -979,3 +979,231 @@ eval validation: {'Loss': 2.3213493824005127, 'Accuracy': 0.0}
 eval validation: {'Loss': 2.4606311321258545, 'Accuracy': 0.0}
 eval validation: {'Loss': 2.4009032249450684, 'Accuracy': 20.0}
 1 tensor(64) Model: 0_CIFAR10_wresnet28x2_100_0.02_iid  Loss: 2.3164  Accuracy: 10.9091
+
+
+#3
+client id1 [16, 70, 1]
+m is 16
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(0%)  Loss: 2.0180  Accuracy: 23.6364  Learning rate: 0.030000  ID: 16(1/3)  Epoch Finished Time: 0:01:46.303656  Experiment Finished Time: 1 day, 11:25:11.303656
+m is 70
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(33%)  Loss: 2.1849  Accuracy: 17.2929  Learning rate: 0.030000  ID: 70(2/3)  Epoch Finished Time: 0:00:52.786155  Experiment Finished Time: 1 day, 11:09:40.786155
+m is 1
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(67%)  Loss: 2.1384  Accuracy: 18.8956  Learning rate: 0.030000  ID: 1(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:21:56
+0 tensor(1) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.9042  Accuracy: 27.0707
+logger mean 27.07070707070707
+1 tensor(16) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.9685  Accuracy: 24.4444
+logger mean 24.444444444444446
+2 tensor(70) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.4008  Accuracy: 10.3030
+logger mean 10.303030303030301
+huaidan tensor(70)
+/Users/xianjianxie/opt/anaconda3/envs/recsys_ae_conda/lib/python3.8/site-packages/torch/optim/lr_scheduler.py:131: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 1(100%)  Loss: 1.9728  Accuracy: 29.4700
+client id1 [49, 40, 41]
+m is 49
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(0%)  Loss: 1.8581  Accuracy: 28.2020  Learning rate: 0.030000  ID: 49(1/3)  Epoch Finished Time: 0:01:44.533708  Experiment Finished Time: 1 day, 10:47:11.533708
+m is 40
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(33%)  Loss: 2.0874  Accuracy: 20.3232  Learning rate: 0.030000  ID: 40(2/3)  Epoch Finished Time: 0:00:52.575565  Experiment Finished Time: 1 day, 10:58:38.575565
+m is 41
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(67%)  Loss: 2.0253  Accuracy: 23.0303  Learning rate: 0.030000  ID: 41(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:52:26
+0 tensor(40) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.3491  Accuracy: 14.1414
+logger mean 14.141414141414142
+huaidan tensor(40)
+1 tensor(41) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8206  Accuracy: 30.7071
+logger mean 30.707070707070706
+2 tensor(49) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8741  Accuracy: 31.9192
+logger mean 31.919191919191928
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 2(100%)  Loss: 1.8437  Accuracy: 36.4600
+client id1 [4, 47, 3]
+m is 4
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(0%)  Loss: 1.8266  Accuracy: 34.2626  Learning rate: 0.030000  ID: 4(1/3)  Epoch Finished Time: 0:01:49.098482  Experiment Finished Time: 1 day, 12:15:36.098482
+m is 47
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(33%)  Loss: 2.0761  Accuracy: 22.2424  Learning rate: 0.030000  ID: 47(2/3)  Epoch Finished Time: 0:00:53.972931  Experiment Finished Time: 1 day, 11:51:42.972931
+m is 3
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(67%)  Loss: 1.9993  Accuracy: 24.6734  Learning rate: 0.030000  ID: 3(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:58:02
+0 tensor(3) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8410  Accuracy: 28.4848
+logger mean 28.48484848484848
+1 tensor(4) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8527  Accuracy: 30.1010
+logger mean 30.101010101010097
+2 tensor(47) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.3089  Accuracy: 9.6970
+logger mean 9.696969696969695
+huaidan tensor(47)
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 3(100%)  Loss: 1.8422  Accuracy: 34.9400
+client id1 [35, 3, 77]
+m is 35
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(0%)  Loss: 1.8745  Accuracy: 30.1818  Learning rate: 0.029999  ID: 35(1/3)  Epoch Finished Time: 0:01:46.604670  Experiment Finished Time: 1 day, 11:23:12.604670
+m is 3
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(33%)  Loss: 2.1014  Accuracy: 19.7374  Learning rate: 0.029999  ID: 3(2/3)  Epoch Finished Time: 0:00:53.375186  Experiment Finished Time: 1 day, 11:25:13.375186
+m is 77
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(67%)  Loss: 2.0175  Accuracy: 23.1246  Learning rate: 0.029999  ID: 77(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:26:24
+0 tensor(3) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.3224  Accuracy: 11.3131
+logger mean 11.313131313131313
+huaidan tensor(3)
+1 tensor(35) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8822  Accuracy: 28.6869
+logger mean 28.68686868686869
+2 tensor(77) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.7990  Accuracy: 31.3131
+logger mean 31.31313131313132
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 4(100%)  Loss: 1.8162  Accuracy: 40.4800
+client id1 [79, 94, 7]
+m is 79
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(0%)  Loss: 1.7959  Accuracy: 32.9697  Learning rate: 0.029998  ID: 79(1/3)  Epoch Finished Time: 0:01:46.888454  Experiment Finished Time: 1 day, 11:26:10.888454
+m is 94
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(33%)  Loss: 2.0557  Accuracy: 21.6162  Learning rate: 0.029998  ID: 94(2/3)  Epoch Finished Time: 0:00:54.257333  Experiment Finished Time: 1 day, 11:57:38.257333
+m is 7
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(67%)  Loss: 1.9821  Accuracy: 24.7677  Learning rate: 0.029998  ID: 7(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:57:32
+0 tensor(7) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8045  Accuracy: 31.9192
+logger mean 31.91919191919192
+1 tensor(79) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.9545  Accuracy: 26.2626
+logger mean 26.262626262626263
+2 tensor(94) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.3436  Accuracy: 8.4848
+logger mean 8.484848484848484
+huaidan tensor(94)
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 5(100%)  Loss: 1.8184  Accuracy: 38.2700
+client id1 [75, 86, 54]
+m is 75
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(0%)  Loss: 1.8022  Accuracy: 32.1616  Learning rate: 0.029997  ID: 75(1/3)  Epoch Finished Time: 0:01:47.608026  Experiment Finished Time: 1 day, 11:37:48.608026
+m is 86
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(33%)  Loss: 2.0612  Accuracy: 21.0707  Learning rate: 0.029997  ID: 86(2/3)  Epoch Finished Time: 0:00:53.719349  Experiment Finished Time: 1 day, 11:33:32.719349
+m is 54
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(67%)  Loss: 2.0061  Accuracy: 23.5421  Learning rate: 0.029997  ID: 54(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:24:43
+0 tensor(54) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8215  Accuracy: 30.9091
+logger mean 30.90909090909091
+1 tensor(75) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 1.8071  Accuracy: 33.9394
+logger mean 33.93939393939394
+2 tensor(86) Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Loss: 2.3194  Accuracy: 11.1111
+logger mean 11.11111111111111
+huaidan tensor(86)
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 6(100%)  Loss: 1.8249  Accuracy: 39.2700
+
+
+#4
+client id1 [16, 70, 1]
+m is 16
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(0%)  Loss: 2.0180  Accuracy: 23.6364  Learning rate: 0.030000  ID: 16(1/3)  Epoch Finished Time: 0:01:44.381458  Experiment Finished Time: 1 day, 10:46:45.381458
+m is 70
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(33%)  Loss: 2.0390  Accuracy: 23.3737  Learning rate: 0.030000  ID: 70(2/3)  Epoch Finished Time: 0:00:52.363401  Experiment Finished Time: 1 day, 10:52:47.363401
+m is 1
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 1(67%)  Loss: 2.0412  Accuracy: 22.9495  Learning rate: 0.030000  ID: 1(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:47:27
+/Users/xianjianxie/opt/anaconda3/envs/recsys_ae_conda/lib/python3.8/site-packages/torch/optim/lr_scheduler.py:131: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 1(100%)  Loss: 1.8517  Accuracy: 29.5300
+client id1 [38, 47, 44]
+m is 38
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(0%)  Loss: 1.7919  Accuracy: 32.4848  Learning rate: 0.030000  ID: 38(1/3)  Epoch Finished Time: 0:01:50.098696  Experiment Finished Time: 1 day, 12:38:18.098696
+m is 47
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(33%)  Loss: 1.8540  Accuracy: 29.1111  Learning rate: 0.030000  ID: 47(2/3)  Epoch Finished Time: 0:00:53.797563  Experiment Finished Time: 1 day, 11:47:24.797563
+m is 44
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 2(67%)  Loss: 1.8478  Accuracy: 29.5084  Learning rate: 0.030000  ID: 44(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:33:30
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 2(100%)  Loss: 1.6273  Accuracy: 40.0000
+client id1 [13, 99, 53]
+m is 13
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(0%)  Loss: 1.7388  Accuracy: 34.1010  Learning rate: 0.030000  ID: 13(1/3)  Epoch Finished Time: 0:01:43.902112  Experiment Finished Time: 1 day, 10:31:58.902112
+m is 99
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(33%)  Loss: 1.7344  Accuracy: 34.8485  Learning rate: 0.030000  ID: 99(2/3)  Epoch Finished Time: 0:00:52.159550  Experiment Finished Time: 1 day, 10:39:25.159550
+m is 53
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 3(67%)  Loss: 1.7338  Accuracy: 35.2458  Learning rate: 0.030000  ID: 53(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:37:23
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 3(100%)  Loss: 1.4899  Accuracy: 44.7600
+client id1 [55, 14, 36]
+m is 55
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(0%)  Loss: 1.6077  Accuracy: 40.8485  Learning rate: 0.029999  ID: 55(1/3)  Epoch Finished Time: 0:01:44.382082  Experiment Finished Time: 1 day, 10:38:56.382082
+m is 14
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(33%)  Loss: 1.6157  Accuracy: 39.8990  Learning rate: 0.029999  ID: 14(2/3)  Epoch Finished Time: 0:00:52.914229  Experiment Finished Time: 1 day, 11:06:51.914229
+m is 36
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 4(67%)  Loss: 1.6364  Accuracy: 39.0707  Learning rate: 0.029999  ID: 36(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:08:19
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 4(100%)  Loss: 1.4005  Accuracy: 48.4400
+client id1 [20, 88, 27]
+m is 20
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(0%)  Loss: 1.5206  Accuracy: 44.6465  Learning rate: 0.029998  ID: 20(1/3)  Epoch Finished Time: 0:01:47.773806  Experiment Finished Time: 1 day, 11:43:47.773806
+m is 88
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(33%)  Loss: 1.5491  Accuracy: 43.5152  Learning rate: 0.029998  ID: 88(2/3)  Epoch Finished Time: 0:00:53.565332  Experiment Finished Time: 1 day, 11:30:06.565332
+m is 27
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 5(67%)  Loss: 1.5481  Accuracy: 44.0943  Learning rate: 0.029998  ID: 27(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:39:58
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 5(100%)  Loss: 1.3268  Accuracy: 50.7000
+client id1 [94, 95, 4]
+m is 94
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(0%)  Loss: 1.4547  Accuracy: 47.2323  Learning rate: 0.029997  ID: 94(1/3)  Epoch Finished Time: 0:01:47.270314  Experiment Finished Time: 1 day, 11:31:06.270314
+m is 95
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(33%)  Loss: 1.4716  Accuracy: 46.9495  Learning rate: 0.029997  ID: 95(2/3)  Epoch Finished Time: 0:00:52.928624  Experiment Finished Time: 1 day, 11:02:08.928624
+m is 4
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 6(67%)  Loss: 1.4708  Accuracy: 46.7475  Learning rate: 0.029997  ID: 4(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:53:12
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 6(100%)  Loss: 1.2591  Accuracy: 54.0200
+client id1 [58, 40, 2]
+m is 58
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 7(0%)  Loss: 1.4637  Accuracy: 46.5859  Learning rate: 0.029996  ID: 58(1/3)  Epoch Finished Time: 0:01:44.113655  Experiment Finished Time: 1 day, 10:25:47.113655
+m is 40
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 7(33%)  Loss: 1.4423  Accuracy: 48.2626  Learning rate: 0.029996  ID: 40(2/3)  Epoch Finished Time: 0:00:54.042177  Experiment Finished Time: 1 day, 11:43:40.042177
+m is 2
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 7(67%)  Loss: 1.4140  Accuracy: 49.2525  Learning rate: 0.029996  ID: 2(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:50:44
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 7(100%)  Loss: 1.2199  Accuracy: 55.7700
+client id1 [95, 68, 82]
+m is 95
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 8(0%)  Loss: 1.3000  Accuracy: 53.2121  Learning rate: 0.029994  ID: 95(1/3)  Epoch Finished Time: 0:01:47.552262  Experiment Finished Time: 1 day, 11:31:19.552262
+m is 68
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 8(33%)  Loss: 1.3255  Accuracy: 53.4141  Learning rate: 0.029994  ID: 68(2/3)  Epoch Finished Time: 0:00:53.897514  Experiment Finished Time: 1 day, 11:35:13.897514
+m is 82
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 8(67%)  Loss: 1.3518  Accuracy: 52.1751  Learning rate: 0.029994  ID: 82(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:36:17
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 8(100%)  Loss: 1.1334  Accuracy: 59.0600
+client id1 [29, 84, 60]
+m is 29
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 9(0%)  Loss: 1.2814  Accuracy: 54.0202  Learning rate: 0.029993  ID: 29(1/3)  Epoch Finished Time: 0:01:48.570638  Experiment Finished Time: 1 day, 11:48:47.570638
+m is 84
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 9(33%)  Loss: 1.2938  Accuracy: 53.5556  Learning rate: 0.029993  ID: 84(2/3)  Epoch Finished Time: 0:00:54.339954  Experiment Finished Time: 1 day, 11:50:03.339954
+m is 60
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 9(67%)  Loss: 1.2935  Accuracy: 53.8047  Learning rate: 0.029993  ID: 60(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:42:32
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 9(100%)  Loss: 1.1295  Accuracy: 59.6800
+client id1 [75, 68, 3]
+m is 75
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 10(0%)  Loss: 1.2409  Accuracy: 54.8283  Learning rate: 0.029991  ID: 75(1/3)  Epoch Finished Time: 0:01:45.798576  Experiment Finished Time: 1 day, 10:51:16.798576
+m is 68
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 10(33%)  Loss: 1.2406  Accuracy: 55.2121  Learning rate: 0.029991  ID: 68(2/3)  Epoch Finished Time: 0:00:53.378189  Experiment Finished Time: 1 day, 11:09:19.378189
+m is 3
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 10(67%)  Loss: 1.2602  Accuracy: 54.6128  Learning rate: 0.029991  ID: 3(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:07:19
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 10(100%)  Loss: 1.0589  Accuracy: 62.3200
+client id1 [80, 51, 2]
+m is 80
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 11(0%)  Loss: 1.2519  Accuracy: 54.2222  Learning rate: 0.029988  ID: 80(1/3)  Epoch Finished Time: 0:01:46.870414  Experiment Finished Time: 1 day, 11:09:47.870414
+m is 51
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 11(33%)  Loss: 1.2283  Accuracy: 55.7172  Learning rate: 0.029988  ID: 51(2/3)  Epoch Finished Time: 0:00:53.993515  Experiment Finished Time: 1 day, 11:30:56.993515
+m is 2
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 11(67%)  Loss: 1.2039  Accuracy: 56.6061  Learning rate: 0.029988  ID: 2(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:26:15
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 11(100%)  Loss: 1.0655  Accuracy: 62.0700
+client id1 [26, 30, 5]
+m is 26
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 12(0%)  Loss: 1.1582  Accuracy: 59.1515  Learning rate: 0.029986  ID: 26(1/3)  Epoch Finished Time: 0:01:49.030449  Experiment Finished Time: 1 day, 11:49:43.030449
+m is 30
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 12(33%)  Loss: 1.2025  Accuracy: 57.5960  Learning rate: 0.029986  ID: 30(2/3)  Epoch Finished Time: 0:00:54.646677  Experiment Finished Time: 1 day, 11:53:59.646677
+m is 5
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 12(67%)  Loss: 1.1916  Accuracy: 58.1414  Learning rate: 0.029986  ID: 5(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:38:17
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 12(100%)  Loss: 0.9998  Accuracy: 64.0400
+client id1 [21, 78, 54]
+m is 21
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 13(0%)  Loss: 1.1530  Accuracy: 58.1818  Learning rate: 0.029983  ID: 21(1/3)  Epoch Finished Time: 0:01:49.068798  Experiment Finished Time: 1 day, 11:47:45.068798
+m is 78
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 13(33%)  Loss: 1.1411  Accuracy: 59.5960  Learning rate: 0.029983  ID: 78(2/3)  Epoch Finished Time: 0:00:55.949432  Experiment Finished Time: 1 day, 12:42:32.949432
+m is 54
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 13(67%)  Loss: 1.1638  Accuracy: 58.7205  Learning rate: 0.029983  ID: 54(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 12:25:30
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 13(100%)  Loss: 0.9712  Accuracy: 65.2300
+client id1 [4, 83, 28]
+m is 4
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 14(0%)  Loss: 1.0844  Accuracy: 62.3838  Learning rate: 0.029980  ID: 4(1/3)  Epoch Finished Time: 0:01:50.524318  Experiment Finished Time: 1 day, 12:13:38.524318
+m is 83
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 14(33%)  Loss: 1.1433  Accuracy: 60.1010  Learning rate: 0.029980  ID: 83(2/3)  Epoch Finished Time: 0:00:54.507965  Experiment Finished Time: 1 day, 11:43:04.507965
+m is 28
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 14(67%)  Loss: 1.1162  Accuracy: 61.2391  Learning rate: 0.029980  ID: 28(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 11:50:28
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 14(100%)  Loss: 0.9522  Accuracy: 66.3300
+client id1 [51, 30, 93]
+m is 51
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 15(0%)  Loss: 1.0839  Accuracy: 61.6970  Learning rate: 0.029977  ID: 51(1/3)  Epoch Finished Time: 0:01:46.434342  Experiment Finished Time: 1 day, 10:50:32.434342
+m is 30
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 15(33%)  Loss: 1.0917  Accuracy: 61.8586  Learning rate: 0.029977  ID: 30(2/3)  Epoch Finished Time: 0:00:52.948087  Experiment Finished Time: 1 day, 10:39:05.948087
+m is 93
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 15(67%)  Loss: 1.0924  Accuracy: 61.8047  Learning rate: 0.029977  ID: 93(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:36:33
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 15(100%)  Loss: 0.9381  Accuracy: 66.4000
+client id1 [33, 48, 19]
+m is 33
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 16(0%)  Loss: 1.0162  Accuracy: 64.0000  Learning rate: 0.029974  ID: 33(1/3)  Epoch Finished Time: 0:01:44.430928  Experiment Finished Time: 1 day, 10:08:35.430928
+m is 48
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 16(33%)  Loss: 1.0393  Accuracy: 63.4343  Learning rate: 0.029974  ID: 48(2/3)  Epoch Finished Time: 0:00:52.128766  Experiment Finished Time: 1 day, 10:04:19.128766
+m is 19
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Train Epoch (C): 16(67%)  Loss: 1.0519  Accuracy: 62.9899  Learning rate: 0.029974  ID: 19(3/3)  Epoch Finished Time: 0:00:00  Experiment Finished Time: 1 day, 10:01:53
+Model: 0_CIFAR10_wresnet28x2_100_0.03_iid  Test Epoch: 16(100%)  Loss: 0.8963  Accuracy: 68.1700

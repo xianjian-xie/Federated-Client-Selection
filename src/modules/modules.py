@@ -159,13 +159,15 @@ class Server:
             # cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
             # output = cos(model_server_param_vector, model_m_param_vector)
             # distance = torch.cdist(model_server_param_vector, model_m_param_vector, p=2)
-            print('output is', valid_client[m].client_id, output1)
+            # print('output is', valid_client[m].client_id, output1)
             # print('distance is', valid_client[m].client_id, distance)
             relation.append(output1)
-            print('relation is ', relation)
-            min_value = min(relation)
-            min_index = relation.index(min_value)
-            print('min index is', min_index)
+        # print('relation is ', relation)
+        min_value = min(relation)
+        min_index = relation.index(min_value)
+        # print('min index is', min_index)
+        valid_client[min_index].good = False
+        print('huaidan', valid_client[min_index].client_id)
 
 
     def update(self, client, dataset, optimizer, metric, logger, epoch):
@@ -237,7 +239,7 @@ class Server:
                     for m in range(len(valid_good_client)):
                         # print('model state dict', valid_client[m].model_state_dict[k].size())
                         # if valid_client[m].good == True:
-                        print('you', valid_good_client[m].client_id)
+                        # print('you', valid_good_client[m].client_id)
                         tmp_v += weight[m] * valid_good_client[m].model_state_dict[k]
                         # else:
                         #     continue

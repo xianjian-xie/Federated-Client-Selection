@@ -7,6 +7,7 @@ if 'cfg' not in globals():
 
 # control name 是值用’_‘连在一起，control是control key和control name形成的字典
 def process_args(args):
+    print('jin process args')
     for k in cfg:
         cfg[k] = args[k]
     if 'control_name' in args and args['control_name'] is not None:

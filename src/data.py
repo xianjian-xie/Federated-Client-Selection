@@ -175,7 +175,11 @@ def separate_dataset(dataset, idx):
 def shuffle_dataset_target(dataset):
     shuffled_dataset = copy.deepcopy(dataset)
     for i in range(len(shuffled_dataset.target)):
-        shuffled_dataset.target[i] = shuffled_dataset.target[(i+1)%len(shuffled_dataset.target)]
+        # print('target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
+        # shuffled_dataset.target[i] = shuffled_dataset.target[(i+1)%len(shuffled_dataset.target)]
+        shuffled_dataset.target[i] = (shuffled_dataset.target[i]+1)%10
+        # print('shuffled target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
+
     return shuffled_dataset
     
 

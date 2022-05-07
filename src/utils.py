@@ -256,11 +256,14 @@ def make_scheduler(optimizer, tag):
 
 
 def resume(model_tag, load_tag='checkpoint', verbose=True, resume_mode=1):
+    print('jin resume', resume_mode)
     if os.path.exists('./output/model/{}_{}.pt'.format(model_tag, load_tag)) and resume_mode == 1:
+        print('jin le if')
         result = load('./output/model/{}_{}.pt'.format(model_tag, load_tag))
         if verbose:
             print('Resume from {}'.format(result['epoch']))
     else:
+        print('jin le else')
         if resume_mode == 1:
             print('Not exists model tag: {}, start from scratch'.format(model_tag))
         result = None
@@ -271,3 +274,9 @@ def collate(input):
     for k in input:
         input[k] = torch.stack(input[k], 0)
     return input
+
+
+def write_log(root, content):
+    log_path =  os.path.join(root, 'experiment_log.txt')
+    with open(log_path, 'a') as f:
+        f.write(content + '\n')

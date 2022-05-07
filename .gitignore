@@ -112,6 +112,9 @@ ENV/
 # PowerPoint temporary
 ~$*.ppt*
 
+# txt log
+*.txt
+.DS_Store
 # data
 data
 

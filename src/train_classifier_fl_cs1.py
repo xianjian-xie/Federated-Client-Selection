@@ -8,8 +8,8 @@ import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
 from config import cfg, process_args
-from data import fetch_dataset, shuffle_dataset_target, split_dataset, make_data_loader, separate_dataset, make_batchnorm_dataset, \
-    make_batchnorm_stats, shuffle_dataset_target
+from data import fetch_dataset, split_dataset, make_data_loader, separate_dataset, make_batchnorm_dataset, \
+    make_batchnorm_stats, shuffle_dataset_target, add_noise_to_dataset, flip_noise_dataset
 from metrics import Metric
 from modules import Server, Client
 from utils import save, to_device, process_control, process_dataset, make_optimizer, make_scheduler, resume, collate, write_log
@@ -27,11 +27,13 @@ for k in cfg:
     exec('parser.add_argument(\'--{0}\', default=cfg[\'{0}\'], type=type(cfg[\'{0}\']))'.format(k))
 parser.add_argument('--control_name', default=None, type=str)
 args = vars(parser.parse_args())
+print('args is', args)
 process_args(args)
 
 
 def main():
     process_control()
+    print('zuihou cfg is', cfg)
     seeds = list(range(cfg['init_seed'], cfg['init_seed'] + cfg['num_experiments']))
     for i in range(cfg['num_experiments']):
         model_tag_list = [str(seeds[i]), cfg['control_name']]
@@ -86,6 +88,7 @@ def runExperiment():
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
     # print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
     if result is None:
+        print('jin result is none', cfg['model_tag'])
         last_epoch = 1
         server = make_server(model, data_split)
         client = make_client(model, data_split)
@@ -110,8 +113,18 @@ def runExperiment():
     for epoch in range(last_epoch, cfg['global']['num_epochs'] + 1):
         time_start=time.time()
         train_client(dataset['train'], server, client, optimizer, metric, logger, epoch)
-        # server.select_client_cosine(client, dataset['train'], optimizer, metric, logger, epoch)
-        # server.select_client_zero_one(client, dataset['train'], optimizer, metric, logger, epoch)
+        if cfg['selection_method'] == 'none':
+            print('jin none')
+        elif cfg['selection_method'] == 'true':
+            print('jin true')
+            server.select_client_all_correct(client, dataset['train'], optimizer, metric, logger, epoch)
+        elif cfg['selection_method'] == 'valid-acc-cluster':
+            print('jin validation')
+            server.select_client_validation_set(client, dataset['train'], optimizer, metric, logger, epoch)
+        elif cfg['selection_method'] == 'valid-cos-cluster':
+            server.select_client_cosine(client, dataset['train'], optimizer, metric, logger, epoch)
+        elif cfg['selection_method'] == 'valid-mask-cluster':
+            server.select_client_zero_one(client, dataset['train'], optimizer, metric, logger, epoch)
         server.update(client, dataset['train'], optimizer, metric, logger, epoch )
         scheduler.step()
         model.load_state_dict(server.model_state_dict)
@@ -137,16 +150,35 @@ def make_server(model, data_split):
 
 
 def make_client(model, data_split):
+    print('jin make client')
     client_id = torch.arange(cfg['num_clients'])
     client = [None for _ in range(cfg['num_clients'])]
-    for m in range(len(client)):
-        # if m >=0 and m <=9:
-        #     client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
-        #     client[m].set_malicious = True
-        #     print('shedingweihuai', client[m].client_id)
-        # else:
-        #     
-        client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
+
+    if cfg['adversarial_ratio'] == 'none':
+        print('jin ratio 0')
+        for m in range(len(client)):
+            client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
+    elif cfg['adversarial_ratio'].split('-')[0] == 'local':
+        print('jin local')
+        adversarial_num = float(cfg['adversarial_ratio'].split('-')[1]) * cfg['num_clients']
+        adversarial_last_idx = adversarial_num - 1
+
+        for m in range(len(client)):
+            
+            if m >= 0 and m <= adversarial_last_idx:
+                client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
+                client[m].set_malicious = True
+                print('shedingweihuai', client[m].client_id)
+            else: 
+                client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
+    elif cfg['adversarial_ratio'].split('-')[0] == 'channel':
+        print('jin channel')
+        for m in range(len(client)):
+            client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
+
+    else:
+        print('ratio doumeijin')
+                
     return client
 
 
@@ -172,9 +204,50 @@ def train_client(dataset, server, client, optimizer, metric, logger, epoch):
         # print('dataset1_len',len(dataset_m.target))
         # print('dataset1',dataset_m.target)
         ############################################################
-        if client[m].set_malicious == True:
-            dataset_m = shuffle_dataset_target(dataset_m)
-            print('thegehuairenjinlaile', client[m].client_id)
+        if cfg['adversarial_ratio'].split('-')[0] == 'local':
+            if client[m].set_malicious == True:
+                if cfg['data_poison_method'] == 'target':
+                    print('jin target')
+                    dataset_m = shuffle_dataset_target(dataset_m)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                elif cfg['data_poison_method'] == 'dataset':
+                    print('jin noise')
+                    dataset_m = add_noise_to_dataset(dataset_m, 0, 1)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                elif cfg['data_poison_method'] == 'target-dataset':
+                    print('jin flip-noise')
+                    dataset_m = flip_noise_dataset(dataset_m, 0, 1)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                else:
+                    print('poison doumeijin')
+        elif cfg['adversarial_ratio'].split('-')[0] == 'channel':
+            print('jin channel pollute', m)
+            adversarial_num = float(cfg['adversarial_ratio'].split('-')[1]) * cfg['num_clients'] * cfg['active_rate']
+            adversarial_last_idx = adversarial_num - 1
+
+            if i >= 0 and i <= adversarial_last_idx:
+                if cfg['data_poison_method'] == 'target':
+                    print('jin flip')
+                    client[m].set_malicious = True
+                    dataset_m = shuffle_dataset_target(dataset_m)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                elif cfg['data_poison_method'] == 'dataset':
+                    print('jin noise')
+                    client[m].set_malicious = True
+                    dataset_m = add_noise_to_dataset(dataset_m, 0, 1)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                elif cfg['data_poison_method'] == 'target-dataset':
+                    print('jin flip-noise')
+                    client[m].set_malicious = True
+                    dataset_m = flip_noise_dataset(dataset_m, 0, 1)
+                    print('thegehuairenjinlaile', client[m].client_id)
+                else:
+                    print('poison doumeijin')
+        elif cfg['adversarial_ratio'] == 'none':
+            print('jin none')
+
+        else:
+            print('doumeijin')
         # if i == 0 or i == 1:
             # dataset_m = shuffle_dataset_target(dataset_m)
         ############################################################

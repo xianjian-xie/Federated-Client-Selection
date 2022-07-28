@@ -30,9 +30,16 @@ https://blog.csdn.net/qinyilang/article/details/5484415
   <!-- train_classifier_fl 标准-->
    python train_classifier_fl_cs.py --control_name CIFAR10_wresnet28x2_100_0.1_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
 
-   python train_classifier_fl_cs.py --control_name CIFAR10_wresnet28x2_100_0.03_iid --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cpu --resume_mode 0 --verbose False
+  <!-- 重构以后的代码跑法 -->
+  !python train_classifier_fl_cs1.py --control_name CIFAR10_wresnet28x2_100_0.10_iid_target-dataset_channel-0.1_valid-acc-cluster_no-diff --pin_memory True --num_workers 0 --init_seed 0 --num_experiments 1 --log_interval 0.25 --device cuda --resume_mode 1 --verbose False
 
+  data_poison_method: 'target', 'dataset', 'model', 'target-dataset', 'none'
+  adversarial_ratio: 'local-0.1', 'channel-0.1', 'none'
+  # local指100个里面有10个坏蛋，channel指每次active的10个必有1个坏蛋 
+  selection_method: 'valid-acc-cluster', 'valid-cos-cluster', 'valid-mask-cluster', 'true', 'none'
+  diff_option: 'no-diff', 'diff'
 
+ 
    
 
 

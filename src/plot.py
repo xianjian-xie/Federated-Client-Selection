@@ -21,11 +21,11 @@ def read_accuracy(file_name, key_word, format):
 
 
 def plot_accuracy():
-    x = np.arange(1,102)
+    x = np.arange(1,57)
     # y1 = np.around(read_accuracy('cs1.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
 
-    y2 = np.around(read_accuracy('log/cs2-20.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
-    y3 = np.around(read_accuracy('log/cs3.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
+    y2 = np.around(read_accuracy('log/cs2.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:56,2], decimals=3)
+    y3 = np.around(read_accuracy('log/cs3.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:56,2], decimals=3)
     # y4 = np.around(read_accuracy('cs4.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
     # y5 = np.around(read_accuracy('cs5-400epoch.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
     # y6 = np.around(read_accuracy('cs6.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
@@ -61,8 +61,8 @@ def read_time_to_accuracy(file_name, key_word, format):
     
 
 def plot_time_to_accuracy():
-    x2 = np.around(read_accuracy('cs2-20bad.txt', 'time cost', '[-+]?[0-9]+\.+[0-9]+')[0:101,0], decimals=3)
-    y2 = np.around(read_accuracy('cs2-20bad.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
+    x2 = np.around(read_accuracy('cs2-20.txt', 'time cost', '[-+]?[0-9]+\.+[0-9]+')[0:101,0], decimals=3)
+    y2 = np.around(read_accuracy('cs2-20.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
     x3 = np.around(read_accuracy('cs3.txt', 'time cost', '[-+]?[0-9]+\.+[0-9]+')[0:101,0], decimals=3)
     y3 = np.around(read_accuracy('cs3.txt', 'Test Epoch', '[-+]?[0-9]+\.+[0-9]+')[0:101,2], decimals=3)
     x4 = np.around(read_accuracy('cs4.txt', 'time cost', '[-+]?[0-9]+\.+[0-9]+')[0:101,0], decimals=3)

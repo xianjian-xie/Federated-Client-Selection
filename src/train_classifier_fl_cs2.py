@@ -88,6 +88,7 @@ def runExperiment():
     result = resume(cfg['model_tag'], resume_mode=cfg['resume_mode'])
     # print('dataset',type(dataset['train']),len(dataset['train'].target),dataset['train'].target)
     if result is None:
+        print('jin result none')
         last_epoch = 1
         server = make_server(model, data_split)
         client = make_client(model, data_split)
@@ -142,7 +143,7 @@ def make_client(model, data_split):
     client_id = torch.arange(cfg['num_clients'])
     client = [None for _ in range(cfg['num_clients'])]
     for m in range(len(client)):
-        if m >=0 and m <= 19:
+        if m >=0 and m <= 9:
             client[m] = Client(client_id[m], model, {'train': data_split['train'][m], 'test': data_split['test'][m]})
             client[m].set_malicious = True
             print('shedingweihuai', client[m].client_id)

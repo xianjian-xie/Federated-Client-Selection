@@ -6,6 +6,10 @@ control:
   num_clients: '100'
   active_rate: '0.1'
   data_split_mode: 'iid'
+  data_poison_method: 'target'
+  adversarial_ratio: 'local-0.1' 
+  selection_method: 'valid-acc-cluster'
+  diff_option: 'no-diff'
 # experiment
 pin_memory: True
 num_workers: 0

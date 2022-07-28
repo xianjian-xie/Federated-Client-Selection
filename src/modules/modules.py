@@ -1,6 +1,8 @@
 import copy
 import datetime
 import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 import sys
 import time
 import torch
@@ -12,8 +14,9 @@ from data import make_data_loader, separate_dataset
 from utils import to_device, make_optimizer, collate, write_log
 import os
 from printlog import make_print_to_file
+from data import add_noise_to_model 
 # from printlog import Logger
-
+np.set_printoptions(linewidth=400)
 
 class Server:
     def __init__(self, model, data_split):
@@ -39,8 +42,9 @@ class Server:
         model_state_dict = {k: v.cpu() for k, v in model.state_dict().items()}
         # print('model_state_dict', model_state_dict.keys())
         # for k, v in model.state_dict().items():
-        #     print('k is', k)
-        #     print('v is', v)
+            # print('k is', k)
+            # print('v is', v.size())
+            # print('v is', v)
         for m in range(len(client)):
             if client[m].active:
                 client[m].model_state_dict = copy.deepcopy(model_state_dict)
@@ -64,6 +68,35 @@ class Server:
                     outlier_idx.append(i)
         print('suoyou', q1,q3,iqr,low,up,outlier_idx)
         return outlier_idx
+
+
+    def find_outlier1(self, relation_list):
+        X = np.array(relation_list).reshape((-1,1))
+        kmeans = KMeans(n_clusters=2, random_state=0).fit(X)
+        label = kmeans.labels_
+        print('label', label)
+        print('center', kmeans.cluster_centers_, kmeans.cluster_centers_.shape)
+        if kmeans.cluster_centers_[0,0] < kmeans.cluster_centers_[1,0]:
+            outlier_idx = np.where(label==1)[0]
+        else:
+            outlier_idx = np.where(label==0)[0]
+        outlier_idx = outlier_idx.tolist()
+        return outlier_idx
+
+    def find_outlier2(self, relation_list):
+        X = np.array(relation_list).reshape((-1,1))
+        gm = GaussianMixture(n_components=2, random_state=0).fit(X)
+        label = gm.predict(X)
+        print('label', label)
+        print('center', gm.means_, gm.means_.shape)
+        if gm.means_[0,0] < gm.means_[1,0]:
+            outlier_idx = np.where(label==1)[0]
+        else:
+            outlier_idx = np.where(label==0)[0]
+        outlier_idx = outlier_idx.tolist()
+        return outlier_idx
+
+
 
     def select_client_all_correct(self, client, dataset, optimizer, metric, logger, epoch):
         valid_client = [client[i] for i in range(len(client)) if client[i].active]
@@ -96,6 +129,86 @@ class Server:
                 prediction_list.append(0)
         print('true positive is', epoch, true_positive, false_negative, false_positive, true_negative)
         print('real list is', epoch, real_list, prediction_list)
+
+
+    def select_client_cluster_density(self, client, dataset, optimizer, metric, logger, epoch):
+        valid_client = [client[i] for i in range(len(client)) if client[i].active]
+
+        dataset_server_validation = separate_dataset(dataset, self.data_split['train'])
+        data_loader_server_validation = make_data_loader({'train': dataset_server_validation}, 'client')['train']
+        relation = []
+        for m in range(len(valid_client)):
+            string_client_id = str(valid_client[m].client_id.item())
+            
+            model_validation = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+            model_validation.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
+            model_validation.load_state_dict(valid_client[m].model_state_dict, strict=False)
+
+            # self.optimizer_state_dict['param_groups'][0]['lr'] = lr
+            # optimizer_validation = make_optimizer(model_validation, 'local')
+            # optimizer_validation.load_state_dict(valid_client[m].optimizer_state_dict)
+            # model_validation.train(True)
+            
+            # for epoch in range(1, cfg['local']['num_epochs'] + 1):
+            for i, input in enumerate(data_loader_server_validation):
+                input = collate(input)
+                input_size = input['data'].size(0)
+                input = to_device(input, cfg['device'])
+                # optimizer_validation.zero_grad()
+                output = model_validation(input)
+                # print('output', output)
+                # output['loss'].backward()
+                # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
+                # optimizer_validation.step()
+                evaluation = metric.evaluate(metric.metric_name['validation'], input, output)
+                # print('eval validation:', evaluation)
+                logger.append(evaluation, 'validation'+string_client_id, n=input_size)
+            
+            info = {'info': ['Model: {}'.format(cfg['model_tag'])
+                            # 'Train Epoch (C): {}({:.0f}%)'.format(epoch, exp_progress),
+                            # 'Learning rate: {:.6f}'.format(lr),
+                            # 'ID: {}({}/{})'.format(client_id[i], i + 1, num_active_clients),
+                            # 'Epoch Finished Time: {}'.format(epoch_finished_time),
+                            # 'Experiment Finished Time: {}'.format(exp_finished_time)
+                            ]}
+            
+            logger.append(info, 'validation'+string_client_id, mean=False)
+            # print(m, valid_client[m].client_id, logger.write('validation'+string_client_id, metric.metric_name['validation']))
+            name = 'validation'+string_client_id+'/Accuracy'
+            print('logger mean', 'epoch', epoch, valid_client[m].client_id, logger.mean[name])
+            relation.append(logger.mean[name])
+        outlier_idx = self.find_outlier(relation, 1.5, 'low')
+        print('outlier_idx is', epoch, outlier_idx)
+        for i in range(len(outlier_idx)):
+            valid_client[outlier_idx[i]].good = False
+            print('huaidan', epoch, valid_client[outlier_idx[i]].client_id)
+        true_positive = 0
+        false_negative = 0
+        false_positive = 0
+        true_negative = 0
+        real_list = []
+        prediction_list = []
+        for i in range(len(valid_client)):
+            if valid_client[i].set_malicious == True and valid_client[i].good == False:
+                true_positive += 1
+                real_list.append(1) # 坏人记为1,好人记为0
+                prediction_list.append(1)
+            elif valid_client[i].set_malicious == True and valid_client[i].good == True:
+                false_negative += 1
+                real_list.append(1)
+                prediction_list.append(0)
+            elif valid_client[i].set_malicious == False and valid_client[i].good == False:
+                false_positive += 1
+                real_list.append(0)
+                prediction_list.append(1)
+            else:
+                true_negative += 1
+                real_list.append(0)
+                prediction_list.append(0)
+        print('true positive is', epoch, true_positive, false_negative, false_positive, true_negative)
+        print('real list is', epoch, real_list, prediction_list)
+            
+        return
 
         
 
@@ -185,10 +298,11 @@ class Server:
         dataset_server_validation = separate_dataset(dataset, self.data_split['train'])
         data_loader_server_validation = make_data_loader({'train': dataset_server_validation}, 'client')['train']
 
-        # model_0 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
-        # model_0.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # model_0.load_state_dict(self.model_state_dict, strict=False)
-        # model_0_dict = {k: v.cpu() for k, v in model_0.state_dict().items()}
+        if cfg['diff_option'] == 'diff':
+            model_0 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+            model_0.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
+            model_0.load_state_dict(self.model_state_dict, strict=False)
+            model_0_dict = {k: v.cpu() for k, v in model_0.state_dict().items()}
 
 
         model_server = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
@@ -222,9 +336,13 @@ class Server:
         model_server_param_vector = torch.zeros([1,1])
         model_server_dict = {k: v.cpu() for k, v in model_server.state_dict().items()}
         for k, v in model_server_dict.items():
-        # for i in list(model_server.state_dict().values()):   
-            # single_server_param_vector = torch.reshape(torch.sub(model_server_dict[k],model_0_dict[k]), (-1,1))
-            single_server_param_vector = torch.reshape(model_server_dict[k], (-1,1))
+        # for i in list(model_server.state_dict().values()): 
+            if cfg['diff_option'] == 'diff':
+                single_server_param_vector = torch.reshape(torch.sub(model_server_dict[k],model_0_dict[k]), (-1,1))
+            elif cfg['diff_option'] == 'no-diff':
+                single_server_param_vector = torch.reshape(model_server_dict[k], (-1,1))
+            else:
+                print('diff doumeijin')
             model_server_param_vector = torch.cat((model_server_param_vector, single_server_param_vector), 0)
         # print('model server vector', model_server_param_vector, model_server_param_vector.size())
 
@@ -242,8 +360,12 @@ class Server:
             model_m_dict = {k: v.cpu() for k, v in model_m.state_dict().items()}
 
             for k, v in model_m_dict.items():
-                # single_m_param_vector = torch.reshape(torch.sub(model_m_dict[k], model_0_dict[k]), (-1,1))
-                single_m_param_vector = torch.reshape(model_m_dict[k], (-1,1))
+                if cfg['diff_option'] == 'diff':
+                    single_m_param_vector = torch.reshape(torch.sub(model_m_dict[k], model_0_dict[k]), (-1,1))
+                elif cfg['diff_option'] == 'no-diff':
+                    single_m_param_vector = torch.reshape(model_m_dict[k], (-1,1))
+                else:
+                    print('diff doumeijin2')
                 model_m_param_vector = torch.cat((model_m_param_vector, single_m_param_vector), 0)
 
             # print('model m vector', model_m_param_vector,  model_m_param_vector.size())
@@ -305,93 +427,66 @@ class Server:
         dataset_server_validation = separate_dataset(dataset, self.data_split['train'])
         data_loader_server_validation = make_data_loader({'train': dataset_server_validation}, 'client')['train']
 
-        # model_0 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
-        # model_0.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # model_0.load_state_dict(self.model_state_dict)
-        # model_0_dict = {k: v.cpu() for k, v in model_0.state_dict().items()}
+        if cfg['diff_option'] == 'diff':
+            model_0 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
+            model_0.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
+            model_0.load_state_dict(self.model_state_dict)
+            model_0_dict = {k: v.cpu() for k, v in model_0.state_dict().items()}
 
-        #######
+        #######观察两两邻接矩阵开始
 
-        # model_3 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
-        # model_3.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # # model_3.load_state_dict(self.model_state_dict)
-        # model_3_dict = {k: v.cpu() for k, v in model_3.state_dict().items()}
-
-        # model_3_param_vector = torch.zeros([1,1])
-        # for k, v in model_3_dict.items():
-        #     single_3_param_vector = torch.reshape(model_3_dict[k], (-1,1))
-        #     model_3_param_vector = torch.cat((model_3_param_vector, single_3_param_vector), 0)
-
-
-
-        # model_4 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
-        # model_4.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # # model_4.load_state_dict(self.model_state_dict)
-        # model_4_dict = {k: v.cpu() for k, v in model_4.state_dict().items()}
-
-        # model_4_param_vector = torch.zeros([1,1])
-        # for k, v in model_4_dict.items():
-        #     single_4_param_vector = torch.reshape(model_4_dict[k], (-1,1))
-        #     model_4_param_vector = torch.cat((model_4_param_vector, single_4_param_vector), 0)
-
-        # output3 = torch.count_nonzero(torch.sub(model_3_param_vector, model_4_param_vector)).item()
-        # print('output3 is', output3)
-
-
-        
-        # model_0_dict = {k: v.cpu() for k, v in model_0.state_dict().items()}
+        # adjacency = np.zeros((10,10))
 
         # model_1 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
         # model_1.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # model_1.load_state_dict(valid_client[0].model_state_dict)
-        # model_1_dict = {k: v.cpu() for k, v in model_1.state_dict().items()}
-
-
-        # model_1_param_vector = torch.zeros([1,1])
-
-        # for k, v in model_1_dict.items():
-        #     single_1_param_vector = torch.reshape(torch.sub(model_1_dict[k], model_0_dict[k]), (-1,1))
-        #     model_1_param_vector = torch.cat((model_1_param_vector, single_1_param_vector), 0)
-
-        # # for k, v in model_1_dict.items():
-        # #     single_1_param_vector = torch.reshape(model_1_dict[k], (-1,1))
-        # #     model_1_param_vector = torch.cat((model_1_param_vector, single_1_param_vector), 0)
-
-        # for i in range(model_1_param_vector.size()[0]):
-        #     if model_1_param_vector[i,0] >= 0:
-        #         model_1_param_vector[i,0] = 1
-        #     else:
-        #         model_1_param_vector[i,0] = 0
 
         # model_2 = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
         # model_2.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
-        # model_2.load_state_dict(valid_client[0].model_state_dict)
-
-        # model_2_param_vector = torch.zeros([1,1])
-        # model_2_dict = {k: v.cpu() for k, v in model_2.state_dict().items()}
-
-        # # print('model 1 dict is', model_1_dict)
-        # # print('model 2 dict is', model_2_dict)
-
-        # for k, v in model_2_dict.items():
-        #     single_2_param_vector = torch.reshape(torch.sub(model_2_dict[k], model_0_dict[k]), (-1,1))
-        #     model_2_param_vector = torch.cat((model_2_param_vector, single_2_param_vector), 0)
-
-        # # for k, v in model_2_dict.items():
-        # #     single_2_param_vector = torch.reshape(model_2_dict[k], (-1,1))
-        # #     model_2_param_vector = torch.cat((model_2_param_vector, single_2_param_vector), 0)
 
 
-        # for i in range(model_2_param_vector.size()[0]):
-        #     if model_2_param_vector[i,0] >= 0:
-        #         model_2_param_vector[i,0] = 1
-        #     else:
-        #         model_2_param_vector[i,0] = 0
+        # for i in range(10):
+        #     for j in range(10):
+        #         model_1.load_state_dict(valid_client[i].model_state_dict)
+        #         model_1_dict = {k: v.cpu() for k, v in model_1.state_dict().items()}
 
-        # output2 = torch.count_nonzero(torch.sub(model_1_param_vector, model_2_param_vector)).item()
-        # print('output2 is', output2)
+        #         model_1_param_vector = torch.zeros([1,1])
 
-        ######
+        #         for k, v in model_1_dict.items():
+        #             single_1_param_vector = torch.reshape(torch.sign(torch.sub(model_1_dict[k], model_0_dict[k])), (-1,1))
+        #             model_1_param_vector = torch.cat((model_1_param_vector, single_1_param_vector), 0).int()
+
+        #         # for k, v in model_1_dict.items():
+        #         #     single_1_param_vector = torch.reshape(model_1_dict[k], (-1,1))
+        #         #     model_1_param_vector = torch.cat((model_1_param_vector, single_1_param_vector), 0)
+
+        #         model_2.load_state_dict(valid_client[j].model_state_dict)
+
+        #         model_2_param_vector = torch.zeros([1,1])
+        #         model_2_dict = {k: v.cpu() for k, v in model_2.state_dict().items()}
+
+        #         # print('model 1 dict is', model_1_dict)
+        #         # print('model 2 dict is', model_2_dict)
+
+        #         for k, v in model_2_dict.items():
+        #             single_2_param_vector = torch.reshape(torch.sign(torch.sub(model_2_dict[k], model_0_dict[k])), (-1,1))
+        #             model_2_param_vector = torch.cat((model_2_param_vector, single_2_param_vector), 0).int()
+
+        #         # for k, v in model_2_dict.items():
+        #         #     single_2_param_vector = torch.reshape(model_2_dict[k], (-1,1))
+        #         #     model_2_param_vector = torch.cat((model_2_param_vector, single_2_param_vector), 0)
+
+        #         output2 = torch.count_nonzero(torch.sub(model_1_param_vector, model_2_param_vector)).item()
+        #         output2 = int(output2)
+        #         # print('output2 is', output2)
+        #         adjacency[i,j] = output2
+                
+        # adjacency = adjacency.astype(int)
+        # print('adjacency matix is')
+        # print(adjacency)
+
+
+        ###########观察邻接矩阵结束
+
 
         model_server = eval('models.{}().to(cfg["device"])'.format(cfg['model_name']))
         model_server.apply(lambda m: models.make_batchnorm(m, momentum=None, track_running_stats=False))
@@ -425,10 +520,14 @@ class Server:
         model_server_dict = {k: v.cpu() for k, v in model_server.state_dict().items()}
         for k, v in model_server_dict.items():
         # for i in list(model_server.state_dict().values()):   
-            # single_server_param_vector = torch.reshape(torch.sub(model_server_dict[k],model_0_dict[k]), (-1,1))
+            if cfg['diff_option'] == 'diff':
+                single_server_param_vector = torch.reshape(torch.sign(torch.sub(model_server_dict[k],model_0_dict[k])), (-1,1))
             # single_server_param_vector = torch.reshape(model_server_dict[k], (-1,1))
-            single_server_param_vector = torch.reshape(torch.sign(model_server_dict[k]), (-1,1))
+            elif cfg['diff_option'] == 'no-diff':
+                single_server_param_vector = torch.reshape(torch.sign(model_server_dict[k]), (-1,1))
             # single_server_param_vector = torch.reshape(torch.heaviside(torch.sub(model_server_dict[k],model_0_dict[k]),torch.tensor([0])), (-1,1))
+            else:
+                print('diff doumeijin')
             model_server_param_vector = torch.cat((model_server_param_vector, single_server_param_vector), 0)
         # print('model server vector', model_server_param_vector, model_server_param_vector.size())
         # for i in range(model_server_param_vector.size()[0]):
@@ -453,10 +552,13 @@ class Server:
             model_m_dict = {k: v.cpu() for k, v in model_m.state_dict().items()}
 
             for k, v in model_m_dict.items():
-                # single_m_param_vector = torch.reshape(torch.sub(model_m_dict[k], model_0_dict[k]), (-1,1))
+                if cfg['diff_option'] == 'diff':
+                    single_m_param_vector = torch.reshape(torch.sign(torch.sub(model_m_dict[k], model_0_dict[k])), (-1,1))
                 # single_m_param_vector = torch.reshape(model_m_dict[k], (-1,1))
-                single_m_param_vector = torch.reshape(torch.sign(model_m_dict[k]), (-1,1))
-                # single_m_param_vector = torch.reshape(torch.heaviside(torch.sub(model_m_dict[k],model_0_dict[k]),torch.tensor([0])), (-1,1))
+                elif cfg['diff_option'] == 'no-diff':
+                    single_m_param_vector = torch.reshape(torch.sign(model_m_dict[k]), (-1,1))
+                else:
+                    print('diff doumeijin2')
                 model_m_param_vector = torch.cat((model_m_param_vector, single_m_param_vector), 0)
 
             # for i in range(model_m_param_vector.size()[0]):
@@ -469,6 +571,8 @@ class Server:
 
 
             output1 = torch.count_nonzero(torch.sub(model_server_param_vector, model_m_param_vector)).item()
+            # output1 = torch.count_nonzero(torch.sub(model_server_param_vector, model_m_param_vector)).item()/model_server_param_vector.size()
+
             # print('model m vector', model_m_param_vector,  model_m_param_vector.size())
             # output1 = F.cosine_similarity(model_server_param_vector, model_m_param_vector, dim = 0)
             # cos = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
@@ -480,7 +584,8 @@ class Server:
             relation.append(output1)
         print('relation is', epoch, relation)
         # write_log(root, 'relation is' + relation)
-        outlier_idx = self.find_outlier(relation, 1.5, 'high')
+        # outlier_idx = self.find_outlier(relation, 1.5, 'high')
+        outlier_idx = self.find_outlier2(relation)
         print('outlier_idx is', epoch, outlier_idx)
         # write_log(root, 'outlier_idx is' + outlier_idx)
         # max_value = max(relation)
@@ -589,9 +694,14 @@ class Server:
                         # print('model state dict', valid_client[m].model_state_dict[k].size())
                         # if valid_client[m].good == True:
                         # print('you', valid_good_client[m].client_id)
-                        tmp_v += weight[m] * valid_good_client[m].model_state_dict[k]
-                        # else:
-                        #     continue
+
+                        # tmp_v += weight[m] * valid_good_client[m].model_state_dict[k]
+                        if cfg['data_poison_method'] == 'noise-model':
+                            noisy_model = add_noise_to_model(valid_client[m].model_state_dict, 0, 1)
+                            tmp_v += weight[m] * noisy_model[k]
+
+                        else:
+                            tmp_v += weight[m] * valid_good_client[m].model_state_dict[k]
                     v.grad = (v.data - tmp_v).detach()
             global_optimizer.step()
             self.global_optimizer_state_dict = global_optimizer.state_dict()
@@ -599,6 +709,8 @@ class Server:
         for i in range(len(client)):
             client[i].active = False
             client[i].good = True
+            if cfg['adversarial_ratio'].split('-')[0] == 'channel':
+                client[i].set_malicious = False
         return
 
 
@@ -614,8 +726,8 @@ class Client:
         self.optimizer_state_dict = optimizer.state_dict()
         self.active = False
         self.buffer = None
-        self.set_malicious = False
-        self.good = True
+        self.set_malicious = False      #是否需要污染数据，使其成为坏人
+        self.good = True    #经过筛选判定为好人
 
     def train(self, dataset, lr, metric, logger):
         data_loader = make_data_loader({'train': dataset}, 'client')['train']

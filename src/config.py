@@ -2,8 +2,11 @@ import yaml
 
 global cfg
 if 'cfg' not in globals():
+    print('jin zhe li 1')
     with open('config.yml', 'r') as f:
+        print('jin zhe li 2')
         cfg = yaml.load(f, Loader=yaml.FullLoader)
+        print('kaishi cfg is', cfg)
 
 # control name 是值用’_‘连在一起，control是control key和control name形成的字典
 def process_args(args):
@@ -16,4 +19,5 @@ def process_args(args):
         cfg['control'] = {control_keys_list[i]: control_name_list[i] for i in range(len(control_name_list))}
     if cfg['control'] is not None:
         cfg['control_name'] = '_'.join([str(cfg['control'][k]) for k in cfg['control']])
+    print('cfg is', cfg)
     return

@@ -174,6 +174,9 @@ def separate_dataset(dataset, idx):
 
 def shuffle_dataset_target(dataset):
     shuffled_dataset = copy.deepcopy(dataset)
+    # for i in range(len(shuffled_dataset.target)):
+    #     print('shuffle is', shuffled_dataset.data[i].shape, type(shuffled_dataset.data[i]))
+    #     shuffle is (32, 32, 3) <class 'numpy.ndarray'>
     for i in range(len(shuffled_dataset.target)):
         # print('target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
         # shuffled_dataset.target[i] = shuffled_dataset.target[(i+1)%len(shuffled_dataset.target)]
@@ -181,7 +184,51 @@ def shuffle_dataset_target(dataset):
         # print('shuffled target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
 
     return shuffled_dataset
+
+def add_noise_to_dataset(dataset, mean, std):
+    noisy_dataset = copy.deepcopy(dataset)
+    # print('original dataset shape is', noisy_dataset.data[0].shape, noisy_dataset.data[0])
+    for i in range(len(noisy_dataset.target)):
+        # print('baocuo1')
+        noise = np.random.normal(mean, std, noisy_dataset.data[i].shape)
+        # noise = noise.astype(np.uint8)
+        # print('baocuo2')
+        # if (i == 0):
+            # print('noise shape is', noise.shape, noise)
+        noisy_dataset.data[i] = (noisy_dataset.data[i]/255 + noise)*255
+        noisy_dataset.data[i] = noisy_dataset.data[i].astype(np.uint8)
     
+    # print('noisy dataset shape is', noisy_dataset.data[0].shape, noisy_dataset.data[0])
+    return noisy_dataset
+
+def add_noise_to_model(model, mean, std):
+    noisy_model = copy.deepcopy(model)
+    for k, v in noisy_model.state_dict().items():
+        noisy_model.state_dict()[k] = noisy_model.state_dict()[k] + torch.randn(noisy_model.state_dict()[k].size()) * std + mean
+    return noisy_model
+    #      return tensor + torch.randn(tensor.size()) * self.std + self.mean
+    #     noisy_model.state_dict()[k] = 
+    #     model_m_dict[k]
+    #     noisy_modelmodel_m.state_dict().items()
+    # for i in range(len(noisy_model.target)):
+    #     noise = np.random.normal(mean, std, noisy_dataset.data[i].shape)
+    #     noisy_dataset.data[i] = noisy_dataset.data[i] + noise
+    # return noisy_dataset
+
+def flip_noise_dataset(dataset, mean, std):
+    flipped_noisy_dataset = copy.deepcopy(dataset)
+    for i in range(len(flipped_noisy_dataset.target)//2):
+        # print('target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
+        # shuffled_dataset.target[i] = shuffled_dataset.target[(i+1)%len(shuffled_dataset.target)]
+        flipped_noisy_dataset.target[i] = (flipped_noisy_dataset.target[i]+1)%10
+        # print('shuffled target is', shuffled_dataset.target[i], type(shuffled_dataset.target[i]))
+    for i in range(len(flipped_noisy_dataset.target)//2, len(flipped_noisy_dataset.target)):
+
+        noise = np.random.normal(mean, std, flipped_noisy_dataset.data[i].shape)
+        flipped_noisy_dataset.data[i] = (flipped_noisy_dataset.data[i]/255 + noise)*255
+        flipped_noisy_dataset.data[i] = flipped_noisy_dataset.data[i].astype(np.uint8)
+
+    return flipped_noisy_dataset
 
 
 def make_batchnorm_dataset(dataset):

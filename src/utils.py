@@ -126,6 +126,12 @@ def process_control():
     cfg['wresnet28x8'] = {'depth': 28, 'widen_factor': 8, 'drop_rate': 0.0}
     cfg['threshold'] = 0.95
     cfg['alpha'] = 0.75
+    ################重构添加
+    cfg['data_poison_method'] = cfg['control']['data_poison_method']
+    cfg['adversarial_ratio'] = cfg['control']['adversarial_ratio']
+    cfg['selection_method'] = cfg['control']['selection_method']
+    cfg['diff_option'] = cfg['control']['diff_option']
+    ################重构添加
     if 'num_clients' in cfg['control']:
         cfg['num_clients'] = int(cfg['control']['num_clients'])
         cfg['active_rate'] = float(cfg['control']['active_rate'])
